@@ -1,0 +1,12 @@
+b1dd89c2db93dc239a1e6c56c88a3b60 *DESCRIPTION
+7932bb728273ebc82d0fcb405978dd57 *INSTALL
+2ae2847f9bc8b2033f88b43b173b0315 *LICENSE
+61cc0c8669d56ef3016e2419a9f59911 *NAMESPACE
+c4c0b33dec696c0fe08dd30ffdc7cd0f *R/argparse.R
+e1544d94befad8aac91867a24029bebd *exec/display_file.R
+f65a89443be69b6a2a1a21b547dccbea *exec/example.R
+3c94c196610aacd17463afd82f452dc0 *inst/doc/argparse.Rnw
+934ea79943f2a3743b84608332754380 *inst/doc/argparse.pdf
+b14d71a37e51851ed4de57c86d3608a4 *inst/tests/test-argparse.R
+7421a3767ee55ba1cc0d3f2010f8d19b *man/ArgumentParser.Rd
+dee356f64601bbde70c896fe19bf88e5 *tests/run-all.R
