@@ -1,5 +1,6 @@
 context("Unit tests")
 
+options(python_cmd = find_python_cmd())
 context("print_help")
 test_that("print_help works as expected", {
     parser <- ArgumentParser(description="Process some integers.")

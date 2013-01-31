@@ -148,29 +148,38 @@ convert_..._to_arguments <- function(mode, ...) {
     return(paste(proposed_arguments, collapse=", "))
 }
 
-# Tests whether the python command can be used with argparse package
+# Tests whether the python command can be used with argparse, (simple)json packages
 is_python <- function(path) {
+    qpath <- sQuote(path)
+    import_code <- c("import argparse", "try: import json", 
+            "except ImportError: import simplejson as json") 
     tryCatch({
-            system(path, intern=TRUE, input="import argparse, json", ignore.stderr=TRUE)
+            system(path, intern=TRUE, input=import_code, ignore.stderr=TRUE)
             TRUE
         }, 
         warning = function(w) { 
-            warning(paste(sprintf("%s", path),
-                        "does not seem to have the argparse and/or json module"))
+            warning(qpath, 
+                "does not seem to have the argparse and/or (simple)json module")
             FALSE
         },
         error = function(e) {
             FALSE
         })
 }
-is_python_vec <- Vectorize(is_python)
 
 # Find a suitable python cmd or give error if not possible
 find_python_cmd <- function() {
-    python_cmds <- c("python", "python3", "python2", "pypy", "jython", 
+    python_cmds <- c("python", "python3", "python2", "pypy",
             sprintf("C:/Python%s/python", c(27, 30:34)))
-    is_pythons <- is_python_vec(python_cmds)
-    python_cmd <- python_cmds[which(is_pythons)][1]
+    python_cmds <- Sys.which(python_cmds)
+    python_cmds <- python_cmds[which(python_cmds != "")]
+    python_cmd <- NA
+    for(cmd in python_cmds) {
+        if(is_python(cmd)) {
+            python_cmd <- cmd
+            break
+        }
+    }
     if(is.na(python_cmd)) {
         stop(paste("Could not find SystemRequirement Python (>= 2.7) on PATH",
                        "nor in a couple common Windows locations.\n",
