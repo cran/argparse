@@ -28,6 +28,9 @@
   \code{ArgumentParser} crates a parser object that acts as
   a wrapper to Python's argparse module
 }
+\section{Acknowledgement}{
+  A big thanks to Martin Diehl for a bug report.
+}
 \examples{
 parser <- ArgumentParser(description='Process some integers')
 parser$add_argument('integers', metavar='N', type="integer", nargs='+',
