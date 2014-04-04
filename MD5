@@ -1,8 +1,8 @@
 eb723b61539feef013de476e68b5c50a *COPYING
-f0cb93943082726ff8e36d42d3195616 *DESCRIPTION
+0a3bae33cd52400e3d42aaf77c04f3c6 *DESCRIPTION
 8ad3ef0c000ecdae6927015cb419a557 *INSTALL
 28c783a78ac1bd4bbe375b552c310cac *NAMESPACE
-094f50753b8d616f257da6cac9be2b4b *NEWS
+5ec1aedf80739510cfc4ed4a16bbe5fd *NEWS
 08ca047822ea52bfaa1cd120cdff9aa8 *R/argparse.R
 8cc2a737536b11c950f80b70c81b540e *build/vignette.rds
 eda77d5ea350d90735e6e2ae661ced48 *exec/display_file.R
@@ -10,8 +10,8 @@ eda77d5ea350d90735e6e2ae661ced48 *exec/display_file.R
 127575a3e709839b79d14566441cbc1e *inst/COPYRIGHTS
 7cf5dd392347d2dbab8e299101b894a5 *inst/doc/argparse.R
 3f8940bbbb1618c7d92c9a30a2bacbd6 *inst/doc/argparse.Rrst
-763d986e555fc787daff81ea00a941b8 *inst/doc/argparse.pdf
+1f6b2c6c0bb685e10bccbe9442d91f9e *inst/doc/argparse.pdf
 2d911db844be6fbc8bab8a9918036757 *man/ArgumentParser.Rd
 9f097169ac01ec553d9ff33da5f47dfa *tests/run-all.R
-379957b30dada0dac7d2a4d6c59d595a *tests/testthat/test-argparse.R
+1ca6864b6cc7ed0e6e630440492191b2 *tests/testthat/test-argparse.R
 3f8940bbbb1618c7d92c9a30a2bacbd6 *vignettes/argparse.Rrst
