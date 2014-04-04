@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2013 Trevor L. Davis <trevor.l.davis@stanford.edu>  
+# Copyright (c) 2012-2014 Trevor L. Davis <trevor.l.davis@stanford.edu>  
 #  
 #  This file is free software: you may copy, redistribute and/or modify it  
 #  under the terms of the GNU General Public License as published by the  
@@ -13,58 +13,12 @@
 #  You should have received a copy of the GNU General Public License  
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.  
 #  
-# This file incorporates work covered by the following copyright and  
-# permission notice:  
+# This file incorporates work from the argparse module in Python 2.7.3.
 #  
-#     Copyright (c) 2001-2009 Python Software Foundation; All Rights Reserved
+#     Copyright (c) 2001-2012 Python Software Foundation; All Rights Reserved
 #
-#     PSF LICENSE AGREEMENT FOR PYTHON 2.7.3
-#     ======================================
-#     
-#        1. This LICENSE AGREEMENT is between the Python Software Foundation ("PSF"), and the Individual or Organization ("Licensee") accessing and otherwise using Python 2.7.3 software in source or binary form and its associated documentation.
-#        2. Subject to the terms and conditions of this License Agreement, PSF hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python 2.7.3 alone or in any derivative version, provided, however, that PSF's License Agreement and PSF's notice of copyright, i.e., "Copyright © 2001-2009 Python Software Foundation; All Rights Reserved" are retained in Python 2.7.3 alone or in any derivative version prepared by Licensee.
-#        3. In the event Licensee prepares a derivative work that is based on or incorporates Python 2.7.3 or any part thereof, and wants to make the derivative work available to others as provided herein, then Licensee hereby agrees to include in any such work a brief summary of the changes made to Python 2.7.3.
-#        4. PSF is making Python 2.7.3 available to Licensee on an "AS IS" basis. PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 2.7.3 WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
-#        5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON 2.7.3 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 2.7.3, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
-#        6. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
-#        7. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between PSF and Licensee. This License Agreement does not grant permission to use PSF trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
-#        8. By copying, installing or otherwise using Python 2.7.3, Licensee agrees to be bound by the terms and conditions of this License Agreement.
-#     
-#     BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
-#     ===========================================
-#     
-#     BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
-#     
-#         1. This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the Individual or Organization ("Licensee") accessing and otherwise using this software in source or binary form and its associated documentation ("the Software").
-#         2. Subject to the terms and conditions of this BeOpen Python License Agreement, BeOpen hereby grants Licensee a non-exclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use the Software alone or in any derivative version, provided, however, that the BeOpen Python License is retained in the Software, alone or in any derivative version prepared by Licensee.
-#         3. BeOpen is making the Software available to Licensee on an "AS IS" basis. BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
-#         4. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
-#         5. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
-#         6. This License Agreement shall be governed by and interpreted in all respects by the law of the State of California, excluding conflict of law provisions. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between BeOpen and Licensee. This License Agreement does not grant permission to use BeOpen trademarks or trade names in a trademark sense to endorse or promote products or services of Licensee, or any third party. As an exception, the "BeOpen Python" logos available at http://www.pythonlabs.com/logos.html may be used according to the permissions granted on that web page.
-#         7. By copying, installing or otherwise using the software, Licensee agrees to be bound by the terms and conditions of this License Agreement.
-#     
-#     CNRI LICENSE AGREEMENT FOR PYTHON 1.6.1
-#     =======================================
-#     
-#         1. This LICENSE AGREEMENT is between the Corporation for National Research Initiatives, having an office at 1895 Preston White Drive, Reston, VA 20191 ("CNRI"), and the Individual or Organization ("Licensee") accessing and otherwise using Python 1.6.1 software in source or binary form and its associated documentation.
-#         2. Subject to the terms and conditions of this License Agreement, CNRI hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python 1.6.1 alone or in any derivative version, provided, however, that CNRI's License Agreement and CNRI's notice of copyright, i.e., "Copyright © 1995-2001 Corporation for National Research Initiatives; All Rights Reserved" are retained in Python 1.6.1 alone or in any derivative version prepared by Licensee. Alternately, in lieu of CNRI's License Agreement, Licensee may substitute the following text (omitting the quotes): "Python 1.6.1 is made available subject to the terms and conditions in CNRI's License Agreement. This Agreement together with Python 1.6.1 may be located on the Internet using the following unique, persistent identifier (known as a handle): 1895.22/1013. This Agreement may also be obtained from a proxy server on the Internet using the following URL: http://hdl.handle.net/1895.22/1013."
-#         3. In the event Licensee prepares a derivative work that is based on or incorporates Python 1.6.1 or any part thereof, and wants to make the derivative work available to others as provided herein, then Licensee hereby agrees to include in any such work a brief summary of the changes made to Python 1.6.1.
-#         4. CNRI is making Python 1.6.1 available to Licensee on an "AS IS" basis. CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6.1 WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
-#         5. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON 1.6.1 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 1.6.1, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
-#         6. This License Agreement will automatically terminate upon a material breach of its terms and conditions.
-#         7. This License Agreement shall be governed by the federal intellectual property law of the United States, including without limitation the federal copyright law, and, to the extent such U.S. federal law does not apply, by the law of the Commonwealth of Virginia, excluding Virginia's conflict of law provisions. Notwithstanding the foregoing, with regard to derivative works based on Python 1.6.1 that incorporate non-separable material that was previously distributed under the GNU General Public License (GPL), the law of the Commonwealth of Virginia shall govern this License Agreement only as to issues arising under or with respect to Paragraphs 4, 5, and 7 of this License Agreement. Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between CNRI and Licensee. This License Agreement does not grant permission to use CNRI trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
-#         8. By clicking on the "ACCEPT" button where indicated, or by copying, installing or otherwise using Python 1.6.1, Licensee agrees to be bound by the terms and conditions of this License Agreement.
-#     
-#     ACCEPT
-#     
-#     CWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2
-#     ==================================================
-#     
-#     Copyright © 1991 - 1995, Stichting Mathematisch Centrum Amsterdam, The Netherlands. All rights reserved.
-#     
-#     Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both that copyright notice and this permission notice appear in supporting documentation, and that the name of Stichting Mathematisch Centrum or CWI not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission.
-#     
-#     STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+# See (inst/)COPYRIGHTS or http://docs.python.org/2/license.html for the full
+# Python (GPL-compatible) license stack.
 
 #' Create a command line parser 
 #'
@@ -89,6 +43,7 @@
 #'      
 #' @import rjson
 #' @import proto
+#' @import findpython
 #' @export
 #' @examples
 #'
@@ -105,8 +60,9 @@
 #' accumulate_fn <- get(args$accumulate)
 #' print(accumulate_fn(args$integers))
 ## ifelse(.Platform$OS.type == "windows", "python.exe", "python")
-ArgumentParser <- function(..., python_cmd=getOption("python_cmd", find_python_cmd())) {
-    if(!is_python(python_cmd)) {
+ArgumentParser <- function(..., 
+                    python_cmd=getOption("python_cmd", find_python_cmd(required_modules = c('argparse', 'json | simplejson')))) {
+    if(!is_python_sufficient(python_cmd, required_modules = c('argparse', 'json | simplejson'))) {
         stop(paste(sprintf("python executable %s either is not installed,", python_cmd), 
                 "is not on the path, or does not have argparse, json modules",
                 "please see INSTALL file"))
@@ -137,7 +93,7 @@ ArgumentParser <- function(..., python_cmd=getOption("python_cmd", find_python_c
                         input=python_code, stdout=TRUE, stderr=TRUE))
             if(grepl("^usage:", output[1])) {
                 cat(output, sep="\n")
-                quit(status=1)
+                if(interactive()) stop("help requested") else quit(status=1) 
             } else {
                 return(rjson::fromJSON(output))
             }
@@ -159,6 +115,16 @@ ArgumentParser <- function(..., python_cmd=getOption("python_cmd", find_python_c
             return(invisible(NULL))
         }
     })
+}
+
+# @param argument argument to be converted from R to Python
+convert_argument <- function(argument) {
+    if(is.character(argument)) argument <- shQuote(argument, type="sh") 
+    if(is.logical(argument)) argument <- ifelse(argument, 'True', 'False') 
+    if(length(argument) > 1) {
+        argument <- sprintf("[%s]", paste(argument, collapse=", "))
+    }
+    argument
 }
 
 # @param mode Either "add_argument" or "ArgumentParser"
@@ -196,6 +162,11 @@ convert_..._to_arguments <- function(mode, ...) {
         }
         proposed_arguments[ii] <- sprintf("nargs=%s", nargs)
     }
+    if(mode == "add_argument" && any(grepl("choices=", proposed_arguments))) {
+        ii <- grep("choices=", proposed_arguments)
+        choices <- convert_argument(argument_list[[ii]])
+        proposed_arguments[ii] <- sprintf("choices=%s", choices)
+    }
     # Make defaults are what Python wants, if specified
     default_string <- switch(mode,
            add_argument = "default=", 
@@ -204,12 +175,14 @@ convert_..._to_arguments <- function(mode, ...) {
     if(any(grepl(default_string, proposed_arguments))) {
         ii <- grep(default_string, proposed_arguments)
         default <- argument_list[[ii]]
-        if(is.character(default)) default <- shQuote(default, type="sh") 
-        if(is.logical(default)) default <- ifelse(default, 'True', 'False') 
-        if(length(default) > 1) {
-            default <- sprintf("[%s]", paste(default, collapse=", "))
-        }
+        default <- convert_argument(default)
         proposed_arguments[ii] <- sprintf("%s%s", default_string, default)
+    }
+    # Don't put quotes around formatter_class argument
+    if(mode == "ArgumentParser" && any(grepl("formatter_class=", proposed_arguments))) {
+        ii <- grep("formatter_class=", proposed_arguments)
+        formatter_class <- argument_list[[ii]]
+        proposed_arguments[ii] <- sprintf("formatter_class=%s", formatter_class)
     }
     # Set right default prog name if not specified, if possible
     # Do last to not screw up other fixes with prog insertion
@@ -219,41 +192,4 @@ convert_..._to_arguments <- function(mode, ...) {
         proposed_arguments <- c(sprintf("prog='%s'", prog), proposed_arguments)
     }
     return(paste(proposed_arguments, collapse=", "))
-}
-
-# Tests whether the python command can be used with argparse, (simple)json packages
-is_python <- function(path) {
-    qpath <- sQuote(path)
-    import_code <- c("import argparse", "try: import json", 
-            "except ImportError: import simplejson as json") 
-    tryCatch({
-            system(path, intern=TRUE, input=import_code, ignore.stderr=TRUE)
-            TRUE
-        }, 
-        warning = function(w) { 
-            warning(qpath, 
-                "does not seem to have the argparse and/or (simple)json module")
-            FALSE
-        },
-        error = function(e) {
-            FALSE
-        })
-}
-
-# Find a suitable python cmd or give error if not possible
-find_python_cmd <- function() {
-    python_cmds <- c("python", "python3", "python2", "python2.7", "pypy",
-            sprintf("C:/Python%s/python", c(27, 30:34)))
-    python_cmds <- Sys.which(python_cmds)
-    python_cmds <- python_cmds[which(python_cmds != "")]
-    python_cmd <- NA
-    for(cmd in python_cmds) {
-        if(is_python(cmd)) return(cmd)
-    }
-    stop(paste("Could not find SystemRequirement Python (>= 2.7) on PATH",
-               "nor in a couple common Windows locations.\n",
-               "Please either install Python, add it to the PATH, and/or set",
-               "the ``python_cmd`` option to the path of its current location",
-               "Please see the INSTALL file for more information"))
-
 }

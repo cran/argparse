@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2013 Trevor L Davis <trevor.l.davis@stanford.edu>
+# Copyright (c) 2012-2014 Trevor L Davis <trevor.l.davis@stanford.edu>
 #  
 #  This file is free software: you may copy, redistribute and/or modify it  
 #  under the terms of the GNU General Public License as published by the  
@@ -12,6 +12,13 @@
 #  
 #  You should have received a copy of the GNU General Public License  
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.  
+#
+# This file incorporates work from the argparse module in Python 2.7.3.
+#  
+#     Copyright (c) 1990-2012 Python Software Foundation; All Rights Reserved
+#
+# See (inst/)COPYRIGHTS or http://docs.python.org/2/license.html for the full
+# Python (GPL-compatible) license stack.
 context("Unit tests")
 
 options(python_cmd = find_python_cmd())
@@ -42,6 +49,8 @@ test_that("convert_..._to_arguments works as expected", {
     expect_match(c.2a(argument_default=30), "argument_default=30")
     expect_match(c.2a(argument_default="foobar"), "argument_default='foobar'")
     expect_match(c.2a(foo="bar"), "^prog='PROGRAM'|^prog='test-argparse.R'")
+    expect_match(c.2a(formatter_class="argparse.ArgumentDefaultsHelpFormatter"),
+                 "formatter_class=argparse.ArgumentDefaultsHelpFormatter")
 })
 
 context("add_argument")
@@ -80,3 +89,12 @@ test_that("ArgumentParser works as expected", {
     expect_output(parser$print_help(), "foobar's saying \\(default: bye\\)")
     expect_error(ArgumentParser(python_cmd="foobar"))
 })
+test_that("parse_args warks as expected", {
+    parser <- ArgumentParser(prog="foobar", usage="%(prog)s arg1 arg2")
+    parser$add_argument('--hello', dest='saying', action='store', default='foo',
+            choices=c('foo', 'bar'), 
+            help="%(prog)s's saying (default: %(default)s)")
+    expect_equal(parser$parse_args("--hello=bar"), list(saying="bar"))
+    # expect_error(parser$parse_args("--hello=what"))
+})
+
