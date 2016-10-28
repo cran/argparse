@@ -29,9 +29,24 @@ test_that("print_help works as expected", {
     expect_output(parser$print_help(), "optional arguments:")
     expect_output(parser$print_help(), "Process some integers.")
     expect_output(parser$print_usage(), "usage:")
-    # expect_output(parser$parse_args("-h"), "usage:")
-    # expect_output(parser$parse_args("--help"), "options:")
+
+    # Request/bug by PlasmaBinturong
+    parser$add_argument('integers', metavar='N', type="integer", nargs='+',
+                       help='an integer for the accumulator')
+    if( interactive()) {
+        expect_error(capture.output(parser$parse_args(), "parse error"))
+        expect_error(capture.output(parser$parse_args("-h")), "help requested")
+    }
 })
+
+context("convert_agument")
+test_that("convert_argument works as expected", {
+    expect_equal(convert_argument("foobar"), "'foobar'")
+    expect_equal(convert_argument(14.9), 14.9)
+    expect_equal(convert_argument(c(12.1, 14.9)), "(12.1, 14.9)")
+    expect_equal(convert_argument(c("a", "b")), "('a', 'b')")
+})
+
 context("convert_..._to_arguments")
 test_that("convert_..._to_arguments works as expected", {
     # test in mode "add_argument"
@@ -72,11 +87,24 @@ test_that("add_argument works as expected", {
     # Bug found by Martin Diehl
     parser$add_argument('--label',type='character',nargs=2,
         dest='label',action='store',default=c("a","b"),help='label for X and Y axis')
-    parser$add_argument('--bool',type='logical',nargs=2,
-        dest='bool',action='store',default=c(FALSE, TRUE))
+    suppressWarnings(parser$add_argument('--bool',type='logical',nargs=2,
+        dest='bool',action='store',default=c(FALSE, TRUE)))
     arguments <- parser$parse_args(c("--sum", "1", "2"))
     expect_equal(arguments$label, c("a", "b"))
     expect_equal(arguments$bool, c(FALSE, TRUE))
+
+    # Frustration of Martí Duran Ferrer
+    expect_warning(parser$add_argument('--bool', type='logical', action='store'))
+
+    # Bug/Feature request found by Hyunsoo Kim
+    p <- ArgumentParser()
+    p$add_argument("--test", default=NULL)
+    expect_equal(p$parse_args()$test, NULL)
+
+    # Feature request of Paul Newell
+    parser <- ArgumentParser()
+    parser$add_argument("extent", nargs=4, type="double", metavar = c("e1", "e2", "e3", "e4"))
+    expect_output(parser$print_usage(), "usage: PROGRAM \\[-h\\] e1 e2 e3 e4")
 })
 
 context("ArgumentParser")
@@ -95,6 +123,20 @@ test_that("parse_args warks as expected", {
             choices=c('foo', 'bar'), 
             help="%(prog)s's saying (default: %(default)s)")
     expect_equal(parser$parse_args("--hello=bar"), list(saying="bar"))
-    # expect_error(parser$parse_args("--hello=what"))
-})
+    if (interactive()) {
+        expect_error(parser$parse_args("--hello=what"))
+    }
 
+    # Bug found by Taylor Pospisil
+    parser <- ArgumentParser()
+    parser$add_argument("--lotsofstuff", type = "character", nargs = "+")
+    args <- parser$parse_args(c("--lotsofstuff", rep("stuff", 1000))) 
+
+    # Unhelpful error message found by Martí Duran Ferrer
+    if (interactive()) {
+        parser <- ArgumentParser()
+        parser$add_argument('M',required=TRUE, help="Test")
+
+        expect_error(parser$parse_args(), "python error")
+    }
+})

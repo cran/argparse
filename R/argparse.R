@@ -83,19 +83,40 @@ ArgumentParser <- function(...,
                     sprintf("args = parser.parse_args([%s])",
                             paste(sprintf("'%s'", args), collapse=", ")),
                     "print(json.dumps(args.__dict__, sort_keys=True))")
-            # if(.Platform$OS.type == "unix") {
-            #     output <- suppressWarnings(system(paste(python_cmd, "2>&1"),
-            #                 input=python_code, intern=TRUE))
-            # } else {
-            #     output <- suppressWarnings(system(paste(python_cmd),
-            #             input=python_code, intern=TRUE))
             output <- suppressWarnings(system2(python_cmd,
                         input=python_code, stdout=TRUE, stderr=TRUE))
             if(grepl("^usage:", output[1])) {
-                cat(output, sep="\n")
-                if(interactive()) stop("help requested") else quit(status=1) 
+                has_positional_arguments <- any(grepl("^positional arguments:", output))
+                has_optional_arguments <- any(grepl("^optional arguments:", output))
+                if (has_positional_arguments || has_optional_arguments) {
+                    if (interactive()) {
+                        # cat(output, sep="\n")
+                        # stop("help requested") 
+                        stop(paste("help requested", paste(output, collapse="\n")), sep="\n")
+                    } else {
+                        cat(output, sep="\n")
+                        quit(status=0)
+                    }
+                } else {
+                    if (interactive()) {
+                        # cat(output, file=stderr(), sep="\n")
+                        stop(paste("parse error", paste(output, collapse="\n")), sep="\n")
+                    } else {
+                        cat(output, file=stderr(), sep="\n")
+                        quit(status=1)
+                    }
+                }
+            } else if(grepl("^Traceback", output[1])) {
+                if (interactive()) { 
+                    # cat(output, file=stderr(), sep="\n")
+                    # stop("python error")
+                    stop(paste("python error", paste(output, collapse="\n")), sep="\n")
+                } else {
+                    cat(output, file=stderr(), sep="\n")
+                    quit(status=1)
+                }
             } else {
-                return(rjson::fromJSON(output))
+                return(rjson::fromJSON(paste(output, collapse="")))
             }
         }
         print_help <- function(.) {
@@ -121,8 +142,9 @@ ArgumentParser <- function(...,
 convert_argument <- function(argument) {
     if(is.character(argument)) argument <- shQuote(argument, type="sh") 
     if(is.logical(argument)) argument <- ifelse(argument, 'True', 'False') 
+    if(is.null(argument)) argument <- 'None'
     if(length(argument) > 1) {
-        argument <- sprintf("[%s]", paste(argument, collapse=", "))
+        argument <- sprintf("(%s)", paste(argument, collapse=", "))
     }
     argument
 }
@@ -149,6 +171,9 @@ convert_..._to_arguments <- function(mode, ...) {
                         "supported types:",
                         "'logical', 'integer', 'double' or 'character'")))
         proposed_arguments[ii] <- sprintf("type=%s", python_type)
+        # warn if type set to "logical" and action set to "store" 
+        if (python_type == "bool" && any(grepl("action='store'", proposed_arguments)))
+            warning("You almost certainly want to use action='store_true' or action='store_false' instead")
                                  
     }
     # make sure nargs are what python wants
@@ -166,6 +191,12 @@ convert_..._to_arguments <- function(mode, ...) {
         ii <- grep("choices=", proposed_arguments)
         choices <- convert_argument(argument_list[[ii]])
         proposed_arguments[ii] <- sprintf("choices=%s", choices)
+    }
+    # Feature request from Paul Newell
+    if(mode == "add_argument" && any(grepl("metavar=", proposed_arguments))) {
+        ii <- grep("metavar=", proposed_arguments)
+        metavar <- convert_argument(argument_list[[ii]])
+        proposed_arguments[ii] <- sprintf("metavar=%s", metavar)
     }
     # Make defaults are what Python wants, if specified
     default_string <- switch(mode,
