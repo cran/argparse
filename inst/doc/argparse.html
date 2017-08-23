@@ -1,0 +1,173 @@
+<h1 id="argparse-command-line-argument-parsing">argparse Command Line Argument Parsing</h1>
+<p>argparse is a command line argument parser inspired by Python's &quot;argparse&quot; library. Use this with Rscript to write &quot;#!&quot;-shebang scripts that accept short and long flags/options and positional arguments, generate a usage statement, and set default values for options that are not specified on the command line.</p>
+<p>In our working directory we have two example R scripts, named &quot;example.R&quot; and &quot;display_file.R&quot; illustrating the use of the argparse package.</p>
+<p><strong>bash$ ls</strong></p>
+<pre><code>display_file.R
+example.R</code></pre>
+<p>In order for a *nix system to recognize a &quot;#!&quot;-shebang line you need to mark the file executable with the <code>chmod</code> command, it also helps to add the directory containing your Rscripts to your path:</p>
+<p><strong>bash$ chmod ug+x display_file.R example.R</strong></p>
+<p><strong>bash$ display_file.R example.R</strong></p>
+<p>Here is what &quot;example.R&quot; contains:</p>
+<p><strong>bash$ display_file.R example.R</strong></p>
+<pre><code>#!/usr/bin/env Rscript
+# Copyright 2012-2013 Trevor L Davis &lt;trevor.l.davis@stanford.edu&gt;
+# Copyright 2008 Allen Day
+#  
+#  This file is free software: you may copy, redistribute and/or modify it  
+#  under the terms of the GNU General Public License as published by the  
+#  Free Software Foundation, either version 2 of the License, or (at your  
+#  option) any later version.  
+#  
+#  This file is distributed in the hope that it will be useful, but  
+#  WITHOUT ANY WARRANTY; without even the implied warranty of  
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  
+#  General Public License for more details.  
+#  
+#  You should have received a copy of the GNU General Public License  
+#  along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  
+suppressPackageStartupMessages(library(&quot;argparse&quot;))
+
+# create parser object
+parser &lt;- ArgumentParser()
+
+# specify our desired options 
+# by default ArgumentParser will add an help option 
+parser$add_argument(&quot;-v&quot;, &quot;--verbose&quot;, action=&quot;store_true&quot;, default=TRUE,
+    help=&quot;Print extra output [default]&quot;)
+parser$add_argument(&quot;-q&quot;, &quot;--quietly&quot;, action=&quot;store_false&quot;, 
+    dest=&quot;verbose&quot;, help=&quot;Print little output&quot;)
+parser$add_argument(&quot;-c&quot;, &quot;--count&quot;, type=&quot;integer&quot;, default=5, 
+    help=&quot;Number of random normals to generate [default %(default)s]&quot;,
+    metavar=&quot;number&quot;)
+parser$add_argument(&quot;--generator&quot;, default=&quot;rnorm&quot;, 
+    help = &quot;Function to generate random deviates [default \&quot;%(default)s\&quot;]&quot;)
+parser$add_argument(&quot;--mean&quot;, default=0, type=&quot;double&quot;,
+    help=&quot;Mean if generator == \&quot;rnorm\&quot; [default %(default)s]&quot;)
+parser$add_argument(&quot;--sd&quot;, default=1, type=&quot;double&quot;,
+        metavar=&quot;standard deviation&quot;,
+    help=&quot;Standard deviation if generator == \&quot;rnorm\&quot; [default %(default)s]&quot;)
+
+# get command line options, if help option encountered print help and exit,
+# otherwise if options not found on command line then set defaults, 
+args &lt;- parser$parse_args()
+
+# print some progress messages to stderr if &quot;quietly&quot; wasn&#39;t requested
+if ( args$verbose ) { 
+    write(&quot;writing some verbose output to standard error...\n&quot;, stderr()) 
+}
+
+# do some operations based on user input
+if( args$generator == &quot;rnorm&quot;) {
+    cat(paste(rnorm(args$count, mean=args$mean, sd=args$sd), collapse=&quot;\n&quot;))
+} else {
+    cat(paste(do.call(args$generator, list(args$count)), collapse=&quot;\n&quot;))
+}
+cat(&quot;\n&quot;)</code></pre>
+<p>By default <em>argparse</em> will generate a help message if it encounters <code>--help</code> or <code>-h</code> on the command line. Note how <code>%(default)s</code> in the example program was replaced by the actual default values in the help statement that <em>argparse</em> generated.</p>
+<p><strong>bash$ example.R --help</strong></p>
+<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
+                 [--sd standard deviation]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Print extra output [default]
+  -q, --quietly         Print little output
+  -c number, --count number
+                        Number of random normals to generate [default 5]
+  --generator GENERATOR
+                        Function to generate random deviates [default &quot;rnorm&quot;]
+  --mean MEAN           Mean if generator == &quot;rnorm&quot; [default 0]
+  --sd standard deviation
+                        Standard deviation if generator == &quot;rnorm&quot; [default 1]</code></pre>
+<p>If you specify default values when creating your <code>ArgumentParser</code> then <em>argparse</em> will use them as expected.</p>
+<p><strong>bash$ example.R</strong></p>
+<pre><code>writing some verbose output to standard error...
+
+0.496417392179449
+-1.44968623418566
+0.994551987503643
+0.235273769364969
+1.63849870410529</code></pre>
+<p>Or you can specify your own values.</p>
+<p><strong>bash$ example.R --mean=10 --sd=10 --count=3</strong></p>
+<pre><code>writing some verbose output to standard error...
+
+23.7936351368706
+13.7044887039074
+13.0659111506645</code></pre>
+<p>If you remember from the example program that <code>--quiet</code> had <code>action=&quot;store_false&quot;</code> and <code>dest=&quot;verbose&quot;</code>. This means that <code>--quiet</code> is a switch that turns the <code>verbose</code> option from its default value of <code>TRUE</code> to <code>FALSE</code>. Note how the <code>verbose</code> and <code>quiet</code> options store their value in the exact same variable.</p>
+<p><strong>bash$ example.R --quiet -c 4 --generator=&quot;runif&quot;</strong></p>
+<pre><code>0.713107120012864
+0.361096843611449
+0.953757359180599
+0.303134505171329</code></pre>
+<p>If you specify an illegal flag then emph{argparse} will print out a usage message and an error message and quit.</p>
+<p><strong>bash$ example.R --silent -m 5</strong></p>
+<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
+                 [--sd standard deviation]
+example.R: error: unrecognized arguments: --silent -m 5</code></pre>
+<p>If you specify the same option multiple times then emph{argparse} will use the value of the last option specified.</p>
+<p><strong>bash$ example.R -c 100 -c 2 -c 1000 -c 7</strong></p>
+<pre><code>writing some verbose output to standard error...
+
+0.826610239331107
+-0.645294648182369
+-1.16106187839972
+-1.1058171090589
+0.180150998480621
+1.21150971973471
+0.421230121361386</code></pre>
+<p><em>argparse</em> can also parse positional arguments. Below we give an example program <em>display_file.R</em>, which is a program that prints out the contents of a single file (the required positional argument, not an optional argument) and which accepts the normal help option as well as an option to add line numbers to the output.</p>
+<p><strong>bash$ display_file.R --help</strong></p>
+<pre><code>usage: display_file.R [-h] [-n] file
+
+positional arguments:
+  file               File to be displayed
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -n, --add_numbers  Print line number at the beginning of each line [default]</code></pre>
+<p><strong>bash$ display_file.R --add_numbers display_file.R</strong></p>
+<pre><code>1 #!/usr/bin/env Rscript
+2 # Copyright 2012-2013 Trevor L Davis &lt;trevor.l.davis@stanford.edu&gt;
+3 #  
+4 #  This file is free software: you may copy, redistribute and/or modify it  
+5 #  under the terms of the GNU General Public License as published by the  
+6 #  Free Software Foundation, either version 2 of the License, or (at your  
+7 #  option) any later version.  
+8 #  
+9 #  This file is distributed in the hope that it will be useful, but  
+10 #  WITHOUT ANY WARRANTY; without even the implied warranty of  
+11 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  
+12 #  General Public License for more details.  
+13 #  
+14 #  You should have received a copy of the GNU General Public License  
+15 #  along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.  
+16 suppressPackageStartupMessages(library(&quot;argparse&quot;))
+17 
+18 parser &lt;- ArgumentParser()
+19 parser$add_argument(&quot;-n&quot;, &quot;--add_numbers&quot;, action=&quot;store_true&quot;, default=FALSE,
+20     help=&quot;Print line number at the beginning of each line [default]&quot;)
+21 parser$add_argument(&quot;file&quot;, nargs=1, help=&quot;File to be displayed&quot;)
+22 
+23 args &lt;- parser$parse_args()
+24 
+25 file &lt;- args$file
+26 
+27 if( file.access(file) == -1) {
+28     stop(sprintf(&quot;Specified file ( %s ) does not exist&quot;, file))
+29 } else {
+30     file_text &lt;- readLines(file)
+31 }
+32 
+33 if(args$add_numbers) {
+34     cat(paste(1:length(file_text), file_text), sep = &quot;\n&quot;)
+35 } else {
+36     cat(file_text, sep = &quot;\n&quot;)
+37 }</code></pre>
+<p><strong>bash$ display_file.R non_existent_file.txt</strong></p>
+<pre><code>Error: Specified file ( non_existent_file.txt ) does not exist
+Execution halted</code></pre>
+<p><strong>bash$ display_file.R</strong></p>
+<pre><code>usage: display_file.R [-h] [-n] file
+display_file.R: error: too few arguments</code></pre>
