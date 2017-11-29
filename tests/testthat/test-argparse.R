@@ -21,7 +21,8 @@
 # Python (GPL-compatible) license stack.
 context("Unit tests")
 
-options(python_cmd = find_python_cmd(required_modules=c("argparse", "json | simplejson")))
+options(python_cmd = find_python_cmd(minimum_version='3.0',
+                                     required_modules=c("argparse", "json | simplejson")))
 context("print_help")
 test_that("print_help works as expected", {
     parser <- ArgumentParser(description="Process some integers.")
@@ -33,8 +34,8 @@ test_that("print_help works as expected", {
     # Request/bug by PlasmaBinturong
     parser$add_argument('integers', metavar='N', type="integer", nargs='+',
                        help='an integer for the accumulator')
+    expect_error(capture.output(parser$parse_args(), "parse error"))
     if( interactive()) {
-        expect_error(capture.output(parser$parse_args(), "parse error"))
         expect_error(capture.output(parser$parse_args("-h")), "help requested")
     }
 })
@@ -111,25 +112,26 @@ test_that("add_argument works as expected", {
     parser$add_argument("-o", "--output_filename", required=FALSE, default="outfile.txt")
     expect_equal(parser$parse_args()$output_filename, "outfile.txt")
 
-    if (interactive()) {
-        parser <- ArgumentParser()
-        parser$add_argument("-o", "--output_filename", required=TRUE, default="outfile.txt")
-        expect_error(parser$parse_args())
-    }
+    parser <- ArgumentParser()
+    parser$add_argument("-o", "--output_filename", required=TRUE, default="outfile.txt")
+    expect_error(parser$parse_args())
 })
 
 context("version")
 test_that("version flags works as expected", {
     # Feature request of Dario Beraldi
+    parser <- ArgumentParser()
+    parser$add_argument("-v", "--version", action='version', version='1.0.1')
     if (interactive()) {
-        parser <- ArgumentParser()
-        parser$add_argument("-v", "--version", action='version', version='1.0.1')
-        expect_error(parser$parse_args('-v'), 'version requested: 1.0.1')
-        expect_error(parser$parse_args('--version'), 'version requested: 1.0.1')
-
-        parser <- ArgumentParser()
-        expect_equal(parser$parse_args(), list())
+        expect_error(parser$parse_args('-v'), 'version requested:\n1.0.1')
+        expect_error(parser$parse_args('--version'), 'version requested:\n1.0.1')
     }
+
+    # empty list
+    parser <- ArgumentParser()
+    el <- parser$parse_args()
+    expect_true(is.list(el))
+    expect_equal(length(el), 0)
 })
 
 context("ArgumentParser")
@@ -148,9 +150,7 @@ test_that("parse_args warks as expected", {
             choices=c('foo', 'bar'), 
             help="%(prog)s's saying (default: %(default)s)")
     expect_equal(parser$parse_args("--hello=bar"), list(saying="bar"))
-    if (interactive()) {
-        expect_error(parser$parse_args("--hello=what"))
-    }
+    expect_error(parser$parse_args("--hello=what"))
 
     # Bug found by Taylor Pospisil
     parser <- ArgumentParser()
@@ -158,10 +158,53 @@ test_that("parse_args warks as expected", {
     args <- parser$parse_args(c("--lotsofstuff", rep("stuff", 1000))) 
 
     # Unhelpful error message found by Martí Duran Ferrer
-    if (interactive()) {
-        parser <- ArgumentParser()
-        parser$add_argument('M',required=TRUE, help="Test")
+    parser <- ArgumentParser()
+    parser$add_argument('M',required=TRUE, help="Test")
 
-        expect_error(parser$parse_args(), "python error")
+    expect_error(parser$parse_args(), "python error")
+
+    # Unhelpful error message found by Alex Reinhart
+    parser <- ArgumentParser("positional_argument")
+    expect_error(parser$parse_args(), "Positional argument following keyword argument.")
+
+    # bug reported by Dominik Mueller
+    p <- argparse::ArgumentParser()
+    p$add_argument('--int', type='integer')
+    p$add_argument('--double', type='double')
+    p$add_argument('--character', type='character')
+
+    input <- '1'
+    args <- p$parse_args(c('--int', input,
+                           '--double', input,
+                           '--character', input))
+    expect_equal(class(args$int), "integer")
+    expect_equal(class(args$double), "numeric")
+    expect_equal(class(args$character), "character")
+    expect_equal(args$int, as.integer(1.0))
+    expect_equal(args$double, 1.0)
+    expect_equal(args$character, '1')
+})
+
+context("Unicode arguments/options")
+test_that("Unicode support works as expected", {
+    skip_on_cran()
+
+    # Bug found by Erick Rocha Fonseca
+    did_find_python3 <- can_find_python_cmd(minimum_version="3.0",
+                                    required_modules=c("argparse", "json|simplejson"),
+                                    silent=TRUE)
+    if(did_find_python3) {
+        p = ArgumentParser(python_cmd = attr(did_find_python3, "python_cmd"))
+        p$add_argument("name")
+        expect_equal(p$parse_args("\u8292\u679C"), list(name = "\u8292\u679C")) # 芒果
+    }
+
+    did_find_python2 <- can_find_python_cmd(maximum_version="2.7",
+                                    required_modules=c("argparse", "json|simplejson"),
+                                    silent=TRUE)
+    if(did_find_python2) {
+        p = ArgumentParser(python_cmd = attr(did_find_python2, "python_cmd"))
+        p$add_argument("name")
+        expect_error(p$parse_args("芒果"), "Non-ASCII character detected.")
     }
 })
