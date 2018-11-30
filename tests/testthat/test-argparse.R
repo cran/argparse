@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2017 Trevor L Davis <trevor.l.davis@stanford.edu>
+# Copyright (c) 2012-2018 Trevor L Davis <trevor.l.davis@gmail.com>
 #  
 #  This file is free software: you may copy, redistribute and/or modify it  
 #  under the terms of the GNU General Public License as published by the  
@@ -143,7 +143,7 @@ test_that("ArgumentParser works as expected", {
     expect_output(parser$print_help(), "foobar's saying \\(default: bye\\)")
     expect_error(ArgumentParser(python_cmd="foobar"))
 })
-test_that("parse_args warks as expected", {
+test_that("parse_args works as expected", {
     parser <- ArgumentParser(prog="foobar", usage="%(prog)s arg1 arg2")
     parser$add_argument('--hello', dest='saying', action='store', default='foo',
             choices=c('foo', 'bar'), 
@@ -151,15 +151,9 @@ test_that("parse_args warks as expected", {
     expect_equal(parser$parse_args("--hello=bar"), list(saying="bar"))
     expect_error(parser$parse_args("--hello=what"))
 
-    # Bug found by Taylor Pospisil
-    parser <- ArgumentParser()
-    parser$add_argument("--lotsofstuff", type = "character", nargs = "+")
-    args <- parser$parse_args(c("--lotsofstuff", rep("stuff", 1000))) 
-
     # Unhelpful error message found by Martí Duran Ferrer
     parser <- ArgumentParser()
     parser$add_argument('M',required=TRUE, help="Test")
-
     expect_error(parser$parse_args(), "python error")
 
     # Unhelpful error message found by Alex Reinhart
@@ -182,13 +176,19 @@ test_that("parse_args warks as expected", {
     expect_equal(args$int, as.integer(1.0))
     expect_equal(args$double, 1.0)
     expect_equal(args$character, '1')
+
+    # Bug found by Taylor Pospisil
+    skip_on_cran() # Once gave an error on win-builder
+    parser <- ArgumentParser()
+    parser$add_argument("--lotsofstuff", type = "character", nargs = "+")
+    args <- parser$parse_args(c("--lotsofstuff", rep("stuff", 1000))) 
+    expect_equal(args$lotsofstuff, rep("stuff", 1000))
 })
 
 # Bug found by Erick Rocha Fonseca
 context("Unicode arguments/options")
 test_that("Unicode support works if Python and OS sufficient", {
-    skip_on_cran() # currently gives error on win-builder (bad Windows unicode support?)
-
+    skip_on_os("windows") # Doesn't work on win-builder (bad Windows unicode support?)
     did_find_python3 <- can_find_python_cmd(minimum_version="3.0",
                                     required_modules=c("argparse", "json|simplejson"),
                                     silent=TRUE)
@@ -198,12 +198,75 @@ test_that("Unicode support works if Python and OS sufficient", {
     expect_equal(p$parse_args("\u8292\u679C"), list(name = "\u8292\u679C")) # 芒果
 })
 test_that("Unicode attempt throws error if Python or OS not sufficient", {
-
+    skip_on_os("windows") # Worked on win-builder but not on AppVeyor
     did_find_python2 <- can_find_python_cmd(maximum_version="2.7",
                                     required_modules=c("argparse", "json|simplejson"),
                                     silent=TRUE)
     if (!did_find_python2) { skip("Need Python 2 to guarantee throws Unicode error") }
     p = ArgumentParser(python_cmd = attr(did_find_python2, "python_cmd"))
     p$add_argument("name")
-    expect_error(p$parse_args("芒果"), "Non-ASCII character detected.")
+    expect_error(p$parse_args("\u8292\u679C"), "Non-ASCII character detected.") # 芒果
+
+})
+
+# Mutually exclusive groups is a feature request by Vince Reuter
+context("Mutually exclusive groups")
+test_that("mutually exclusive groups works as expected", {
+    parser = ArgumentParser(prog='PROG')
+    group = parser$add_mutually_exclusive_group()
+    group$add_argument('--foo', action='store_true')
+    group$add_argument('--bar', action='store_false')
+    arguments <- parser$parse_args('--foo')
+    expect_true(arguments$bar)
+    expect_true(arguments$foo)
+    arguments <- parser$parse_args('--bar')
+    expect_false(arguments$bar)
+    expect_false(arguments$foo)
+    expect_error(parser$parse_args(c('--foo', '--bar')), "argument --bar: not allowed with argument --foo")
+
+    parser = ArgumentParser(prog='PROG')
+    group = parser$add_mutually_exclusive_group(required=TRUE)
+    group$add_argument('--foo', action='store_true')
+    group$add_argument('--bar', action='store_false')
+    expect_error(parser$parse_args(character()), " one of the arguments --foo --bar is required")
+})
+
+# argument groups is a feature request by Dario Beraldi
+context("Add argument group")
+test_that("add argument group works as expected", {
+    parser = ArgumentParser(prog='PROG', add_help=FALSE)
+    group1 = parser$add_argument_group('group1', 'group1 description')
+    group1$add_argument('foo', help='foo help')
+    group2 = parser$add_argument_group('group2', 'group2 description')
+    group2$add_argument('--bar', help='bar help')
+    expect_output(parser$print_help(), "group1 description")
+    expect_output(parser$print_help(), "group2 description")
+})
+
+# subparser support is a feature request by Zebulun Arendsee
+context("Supparser support")
+test_that("sub parsers work as expected", {
+    # create the top-level parser
+    parser = ArgumentParser(prog='PROG')
+    parser$add_argument('--foo', action='store_true', help='foo help')
+    subparsers = parser$add_subparsers(help='sub-command help')
+   
+    # create the parser for the "a" command
+    parser_a = subparsers$add_parser('a', help='a help')
+    parser_a$add_argument('bar', type='integer', help='bar help')
+   
+    # create the parser for the "b" command
+    parser_b = subparsers$add_parser('b', help='b help')
+    parser_b$add_argument('--baz', choices='XYZ', help='baz help')
+   
+    # parse some argument lists
+    arguments <- parser$parse_args(c('a', '12'))
+    expect_equal(arguments$bar, 12)
+    expect_equal(arguments$foo, FALSE)
+    arguments <- parser$parse_args(c('--foo', 'b', '--baz', 'Z'))
+    expect_equal(arguments$baz, 'Z')
+    expect_equal(arguments$foo, TRUE)
+    expect_output(parser$print_help(), "sub-command help")
+    expect_output(parser_a$print_help(), "usage: PROG a")
+    expect_output(parser_b$print_help(), "usage: PROG b")
 })

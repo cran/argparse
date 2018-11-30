@@ -1,7 +1,21 @@
+argparse 2.0.0
+==============
+* Now uses ``R6`` classes instead of ``proto`` classes (#25).  
+  The typical user shouldn't need to change any ``argparse`` code 
+  but I did make private the previously public ``python_code``
+  element of the object returned by ``ArgumentParser()``.
+* Parsers now support ``add_subparsers`` (#14).
+  Suggestion of Zebulun Arendsee.
+* Parsers now support ``add_argument_group`` (#26).  
+  Suggestion of Dario Beraldi. 
+* Parsers now support ``add_mutually_exclusive_group`` (#23).  
+  Suggestion of Vince Reuter.
+
 argparse 1.1.1
 ==============
 * Better support for machines only running Python 2.7.  
-* DESCRIPTION makes explicit that it requires version 1.0.0 of ``proto`` dependency.  Thanks Christophe Poulet for bug report.
+* DESCRIPTION makes explicit that it requires version 1.0.0 of ``proto`` dependency.  
+  Thanks Christophe Poulet for bug report.
 
 argparse 1.1.0
 ==============

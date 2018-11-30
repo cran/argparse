@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2017 Trevor L. Davis <trevor.l.davis@stanford.edu>  
+# Copyright (c) 2012-2018 Trevor L. Davis <trevor.l.davis@gmail.com>  
 #  
 #  This file is free software: you may copy, redistribute and/or modify it  
 #  under the terms of the GNU General Public License as published by the  
@@ -43,7 +43,7 @@
 #'     A big thanks to Martin Diehl for a bug report.
 #'      
 #' @import jsonlite
-#' @import proto
+#' @import R6
 #' @import findpython
 #' @export
 #' @examples
@@ -64,24 +64,76 @@
 ArgumentParser <- function(..., python_cmd=NULL) {
     python_cmd <- .find_python_cmd(python_cmd)
     .assert_python_cmd(python_cmd) 
-    python_code = c("import argparse",
-    "try:",
-    "    import json",
-    "except ImportError:",
-    "    import simplejson as json", 
-    "",
-    sprintf("parser = argparse.ArgumentParser(%s)", 
-            convert_..._to_arguments("ArgumentParser", ...)),
-    "")
-    proto(expr = {
-        python_code = python_code
-        parse_args = function(., args=commandArgs(TRUE)) {
-            python_code <- c(.$python_code, 
-                    sprintf("args = parser.parse_args([%s])",
+    initial_python_code <- c("import argparse",
+        "try:",
+        "    import json",
+        "except ImportError:",
+        "    import simplejson as json", 
+        "",
+        sprintf("parser = argparse.ArgumentParser(%s)", 
+                convert_..._to_arguments("ArgumentParser", ...)),
+        "")
+    Parser$new(Code$new(python_cmd, initial_python_code), "parser")
+}
+
+Code <- R6Class("Code",
+    public = list(
+        append = function(new_code) { 
+            private$code <- c(private$code, new_code)
+        },
+        run = function(new_code) {
+            code <- c(private$code, new_code)
+            suppressWarnings(system2(private$cmd, input=code, 
+                                    stdout=TRUE, stderr=TRUE))
+        },
+        initialize = function(cmd, code=character(0)) {
+            private$cmd <- cmd
+            private$code <- code
+        }
+    ),
+    private = list(code = NULL, cmd = NULL)
+)
+
+Group <- R6Class("Group",
+    public = list(
+        initialize = function(python_code, name) {
+            private$python_code <- python_code
+            private$name <- name
+        },
+        add_argument = function(...) {
+            private$python_code$append(sprintf("%s.add_argument(%s)", 
+                private$name, convert_..._to_arguments("add_argument", ...)))
+            return(invisible(NULL))
+        }
+    ),
+    private = list(python_code = NULL, name = NULL)
+)
+
+Subparsers <- R6Class("Subparsers",
+    public = list(
+        initialize = function(python_code, name) {
+            private$python_code <- python_code
+            private$name <- name
+        },
+        add_parser = function(...) {
+            parser_name <- paste0(private$name, "_subparser", private$n_subparsers)
+            private$n_subparsers <- private$n_subparsers + 1
+            private$python_code$append(sprintf("%s = %s.add_parser(%s)",
+                            parser_name, private$name,
+                            convert_..._to_arguments("add_argument", ...)))
+            Parser$new(private$python_code, parser_name)
+        }
+    ),
+    private = list(python_code = NULL, name = NULL, n_subparsers = 0)
+)
+
+Parser <- R6Class("Parser",
+    public = list(
+        parse_args = function(args=commandArgs(TRUE)) {
+            new_code <- c(sprintf("args = %s.parse_args([%s])", private$name,
                             paste(sprintf("'%s'", args), collapse=", ")),
                     "print(json.dumps(args.__dict__, sort_keys=True))")
-            output <- suppressWarnings(system2(python_cmd,
-                        input=python_code, stdout=TRUE, stderr=TRUE))
+            output <- private$python_code$run(new_code)
             if(grepl("^usage:", output[1])) {
                 has_positional_arguments <- any(grepl("^positional arguments:", output))
                 has_optional_arguments <- any(grepl("^optional arguments:", output))
@@ -109,25 +161,53 @@ ArgumentParser <- function(..., python_cmd=NULL) {
             } else { # presumably version number request
                 .print_message_and_exit(output, "version requested:")
             }
-        }
-        print_help <- function(.) {
-            python_code <- c(.$python_code, "parser.print_help()")
-            cat(system(python_cmd, input=python_code, intern=TRUE), sep="\n")   
+        },
+        print_help = function() {
+            cat(private$python_code$run(sprintf("%s.print_help()", private$name)), sep="\n")   
             invisible(NULL)
-        }
-        print_usage <- function(.) {
-            python_code <- c(.$python_code, "parser.print_usage()")
-            cat(system(python_cmd, input=python_code, intern=TRUE), sep="\n")   
+        },
+        print_usage = function() {
+            cat(private$python_code$run(sprintf("%s.print_usage()", private$name)), sep="\n")   
             invisible(NULL)
-        }
-        add_argument = function(., ...) {
-            .$python_code <- c(.$python_code,
-                    sprintf("parser.add_argument(%s)",
+        },
+        add_argument = function(...) {
+            private$python_code$append(sprintf("%s.add_argument(%s)", private$name,
                             convert_..._to_arguments("add_argument", ...)))
-            return(invisible(NULL))
+            invisible(NULL)
+        },
+        add_argument_group = function(...) {
+            group_name <- paste0(private$name, "_group", private$n_groups)
+            private$n_groups <- private$n_groups + 1
+            private$python_code$append(sprintf("%s = %s.add_argument_group(%s)", 
+                           group_name, private$name, 
+                            convert_..._to_arguments("add_argument", ...)))
+            Group$new(private$python_code, group_name)
+        },
+        add_mutually_exclusive_group = function(required=FALSE) {
+            group_name <- paste0(private$name, "_mutually_exclusive_group", 
+                                 private$n_mutually_exclusive_groups)
+            private$n_mutually_exclusive_groups <- private$n_mutually_exclusive_groups + 1
+            private$python_code$append(sprintf("%s = %s.add_mutually_exclusive_group(%s)", 
+                           group_name, private$name,
+                           ifelse(required, "required=True", "")))
+            Group$new(private$python_code, group_name)
+        },
+        add_subparsers = function(...) {
+            subparsers_name <- paste0(private$name, "_subparsers")
+            private$python_code$append(sprintf("%s = %s.add_subparsers(%s)",
+                            subparsers_name, private$name,
+                            convert_..._to_arguments("add_argument", ...)))
+            Subparsers$new(private$python_code, subparsers_name)
+        },
+        initialize = function(python_code, name) {
+            private$python_code <- python_code
+            private$name <- name
         }
-    })
-}
+    ),
+    private = list(python_code = NULL, name = NULL,
+                   n_mutually_exclusive_groups = 0, n_groups = 0)
+)
+
 
 # @param argument argument to be converted from R to Python
 convert_argument <- function(argument) {
