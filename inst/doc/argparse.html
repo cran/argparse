@@ -65,7 +65,8 @@ if( args$generator == &quot;rnorm&quot;) {
 cat(&quot;\n&quot;)</code></pre>
 <p>By default <em>argparse</em> will generate a help message if it encounters <code>--help</code> or <code>-h</code> on the command line. Note how <code>%(default)s</code> in the example program was replaced by the actual default values in the help statement that <em>argparse</em> generated.</p>
 <p><strong>bash$ example.R --help</strong></p>
-<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN] [--sd standard deviation]
+<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
+                 [--sd standard deviation]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -82,28 +83,29 @@ optional arguments:
 <p><strong>bash$ example.R</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-0.10993478029974
--0.681761915861122
--0.0512850082863087
-0.947918918095658
--0.853836184747802</code></pre>
+-1.06685426911631
+2.07267182209934
+0.177732700153811
+-0.364583749009423
+1.11266554323483</code></pre>
 <p>Or you can specify your own values.</p>
 <p><strong>bash$ example.R --mean=10 --sd=10 --count=3</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-15.7953088711777
-15.6331143934276
-25.4052408966994</code></pre>
+13.6157557470603
+4.92078844263403
+1.06084359314921</code></pre>
 <p>If you remember from the example program that <code>--quiet</code> had <code>action=&quot;store_false&quot;</code> and <code>dest=&quot;verbose&quot;</code>. This means that <code>--quiet</code> is a switch that turns the <code>verbose</code> option from its default value of <code>TRUE</code> to <code>FALSE</code>. Note how the <code>verbose</code> and <code>quiet</code> options store their value in the exact same variable.</p>
 <p><strong>bash$ example.R --quiet -c 4 --generator=&quot;runif&quot;</strong></p>
-<pre><code>0.891568498685956
-0.761038959491998
-0.429479005048051
-0.980815970804542</code></pre>
+<pre><code>0.585117821116
+0.44876047433354
+0.553818061249331
+0.706405627075583</code></pre>
 <p>If you specify an illegal flag then emph{argparse} will print out a usage message and an error message and quit.</p>
 <p><strong>bash$ example.R --silent -m 5</strong></p>
 <pre><code>Error in .stop(output, &quot;parse error:&quot;) : parse error:
-usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN] [--sd standard deviation]
+usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
+                 [--sd standard deviation]
 example.R: error: unrecognized arguments: --silent -m 5
 Calls: &lt;Anonymous&gt; -&gt; .stop
 Execution halted</code></pre>
@@ -111,13 +113,13 @@ Execution halted</code></pre>
 <p><strong>bash$ example.R -c 100 -c 2 -c 1000 -c 7</strong></p>
 <pre><code>writing some verbose output to standard error...
 
--1.00132128611148
-0.655645902482251
-0.591589899407965
--0.685532592108172
-0.437140479437686
--0.867293188138318
--0.953211242981137</code></pre>
+0.60929519958713
+-0.445694604931602
+0.545435124098396
+-1.00232990318408
+0.305037245112613
+-0.756307170375785
+1.36119370684695</code></pre>
 <p><em>argparse</em> can also parse positional arguments. Below we give an example program <em>display_file.R</em>, which is a program that prints out the contents of a single file (the required positional argument, not an optional argument) and which accepts the normal help option as well as an option to add line numbers to the output.</p>
 <p><strong>bash$ display_file.R --help</strong></p>
 <pre><code>usage: display_file.R [-h] [-n] file

@@ -1,5 +1,5 @@
-argparse: Command line optional and positional argument parser.
-===============================================================
+argparse: Command line optional and positional argument parser
+==============================================================
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/argparse)](https://cran.r-project.org/package=argparse)
 
@@ -10,8 +10,6 @@ argparse: Command line optional and positional argument parser.
 [![Coverage Status](https://img.shields.io/codecov/c/github/trevorld/r-argparse.svg)](https://codecov.io/github/trevorld/r-argparse?branch=master)
 
 [![RStudio CRAN mirror downloads](https://cranlogs.r-pkg.org/badges/argparse)](https://cran.r-project.org/package=argparse)
-
-[![Project Status: Active -- The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 
 `argparse` is an R package which provides a command line parser to be
 used with Rscript to write \"\#!\" shebang scripts that gracefully
@@ -28,23 +26,23 @@ To install the development version use the following command:
     > remotes::install_github("trevorld/r-argparse")
 
 dependencies
-============
+------------
 
 The package has a Python dependency. It is easily satisfied if you have
 Python (version 3.2 or higher) on your PATH. Read the INSTALL file for
 more information if this doesn\'t describe you.
 
 Additionally this package depends on the R packages `R6`, `findpython`,
-`getopt`, and `jsonlite`.
+and `jsonlite`.
 
 To run the unit tests you will need the suggested R package `testthat`
 and in order to build the vignette you will need the suggested R package
 `knitr` which in turn probably requires the system tool `pandoc`:
 
-    sudo apt-get install pandoc
+    sudo apt install pandoc
 
 examples
-========
+--------
 
     > library("argparse")
     > parser <- ArgumentParser(description='Process some integers')
@@ -80,7 +78,6 @@ Beginning with version 2.0 `argparse` also supports argument groups:
     > group1$add_argument('foo', help='foo help')
     > group2 = parser$add_argument_group('group2', 'group2 description')
     > group2$add_argument('--bar', help='bar help')
-    > expect_output(parser$print_help(), "group1 description")
     > parser$print_help()
     usage: PROG [-h] [--bar BAR] foo
 

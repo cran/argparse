@@ -42,7 +42,7 @@ test_that("print_help works as expected", {
 context("convert_agument")
 test_that("convert_argument works as expected", {
     expect_equal(convert_argument("foobar"), "'foobar'")
-    expect_equal(convert_argument(14.9), 14.9)
+    expect_equal(convert_argument(14.9), "14.9")
     expect_equal(convert_argument(c(12.1, 14.9)), "(12.1, 14.9)")
     expect_equal(convert_argument(c("a", "b")), "('a', 'b')")
 })
@@ -142,6 +142,11 @@ test_that("ArgumentParser works as expected", {
     expect_output(parser$print_help(), "foobar arg1 arg2")
     expect_output(parser$print_help(), "foobar's saying \\(default: bye\\)")
     expect_error(ArgumentParser(python_cmd="foobar"))
+    skip_if_not(interactive(), "Skip passing -h if not interactive()") 
+    # Bug report by George Chlipala
+    expect_error(ArgumentParser()$parse_args("-h"), "help requested")
+    expect_error(ArgumentParser(add_help=TRUE)$parse_args("-h"), "help requested")
+    expect_error(ArgumentParser(add_help=FALSE)$parse_args("-h"), "unrecognized arguments")
 })
 test_that("parse_args works as expected", {
     parser <- ArgumentParser(prog="foobar", usage="%(prog)s arg1 arg2")
@@ -188,7 +193,8 @@ test_that("parse_args works as expected", {
 # Bug found by Erick Rocha Fonseca
 context("Unicode arguments/options")
 test_that("Unicode support works if Python and OS sufficient", {
-    skip_on_os("windows") # Doesn't work on win-builder (bad Windows unicode support?)
+    skip_on_os("windows") # Didn't work on win-builder
+    skip_on_cran() # Didn't work on Debian Clang
     did_find_python3 <- can_find_python_cmd(minimum_version="3.0",
                                     required_modules=c("argparse", "json|simplejson"),
                                     silent=TRUE)
@@ -198,7 +204,8 @@ test_that("Unicode support works if Python and OS sufficient", {
     expect_equal(p$parse_args("\u8292\u679C"), list(name = "\u8292\u679C")) # 芒果
 })
 test_that("Unicode attempt throws error if Python or OS not sufficient", {
-    skip_on_os("windows") # Worked on win-builder but not on AppVeyor
+    skip_on_os("windows") # Didn't work on AppVeyor
+    skip_on_cran() # Didn't work on Debian Clang
     did_find_python2 <- can_find_python_cmd(maximum_version="2.7",
                                     required_modules=c("argparse", "json|simplejson"),
                                     silent=TRUE)
