@@ -1,14 +1,188 @@
-<h1 id="argparse-command-line-argument-parsing">argparse Command Line Argument Parsing</h1>
-<p>argparse is a command line argument parser inspired by Python's &quot;argparse&quot; library. Use this with Rscript to write &quot;#!&quot;-shebang scripts that accept short and long flags/options and positional arguments, generate a usage statement, and set default values for options that are not specified on the command line.</p>
-<p>In our working directory we have two example R scripts, named &quot;example.R&quot; and &quot;display_file.R&quot; illustrating the use of the argparse package.</p>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title></title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>argparse is a command line argument parser inspired by Python&#39;s &ldquo;argparse&rdquo; library.  Use this with Rscript to write &ldquo;#!&rdquo;-shebang scripts that accept short and long flags/options and positional arguments, generate a usage statement, and set default values for options that are not specified on the command line.</p>
+
+<p>In our working directory we have two example R scripts, named &ldquo;example.R&rdquo; and &ldquo;display_file.R&rdquo; illustrating the use of the argparse package.</p>
+
 <p><strong>bash$ ls</strong></p>
+
 <pre><code>display_file.R
-example.R</code></pre>
-<p>In order for a *nix system to recognize a &quot;#!&quot;-shebang line you need to mark the file executable with the <code>chmod</code> command, it also helps to add the directory containing your Rscripts to your path:</p>
+example.R
+</code></pre>
+
+<p>In order for a *nix system to recognize a &ldquo;#!&rdquo;-shebang line you need to mark the file executable with the <code>chmod</code> command, it also helps to add the directory containing your Rscripts to your path:</p>
+
 <p><strong>bash$ chmod ug+x display_file.R example.R</strong></p>
+
 <p><strong>bash$ display_file.R example.R</strong></p>
-<p>Here is what &quot;example.R&quot; contains:</p>
+
+<p>Here is what &ldquo;example.R&rdquo; contains:</p>
+
 <p><strong>bash$ display_file.R example.R</strong></p>
+
 <pre><code>#!/usr/bin/env Rscript
 # Copyright 2012-2013 Trevor L Davis &lt;trevor.l.davis@gmail.com&gt;
 # Copyright 2008 Allen Day
@@ -62,66 +236,98 @@ if( args$generator == &quot;rnorm&quot;) {
 } else {
     cat(paste(do.call(args$generator, list(args$count)), collapse=&quot;\n&quot;))
 }
-cat(&quot;\n&quot;)</code></pre>
-<p>By default <em>argparse</em> will generate a help message if it encounters <code>--help</code> or <code>-h</code> on the command line. Note how <code>%(default)s</code> in the example program was replaced by the actual default values in the help statement that <em>argparse</em> generated.</p>
-<p><strong>bash$ example.R --help</strong></p>
-<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
-                 [--sd standard deviation]
+cat(&quot;\n&quot;)
+</code></pre>
+
+<p>By default <code>argparse</code> will generate a help message if it encounters <code>--help</code> or <code>-h</code> on the command line.  Note how <code>%(default)s</code> in the example program was replaced by the actual default values in the help statement that <code>argparse</code> generated.</p>
+
+<p><strong>bash$ example.R &ndash;help</strong></p>
+
+<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR]
+                 [--mean MEAN] [--sd standard deviation]
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         Print extra output [default]
   -q, --quietly         Print little output
   -c number, --count number
-                        Number of random normals to generate [default 5]
+                        Number of random normals to generate [default
+                        5]
   --generator GENERATOR
-                        Function to generate random deviates [default &quot;rnorm&quot;]
+                        Function to generate random deviates [default
+                        &quot;rnorm&quot;]
   --mean MEAN           Mean if generator == &quot;rnorm&quot; [default 0]
   --sd standard deviation
-                        Standard deviation if generator == &quot;rnorm&quot; [default 1]</code></pre>
-<p>If you specify default values when creating your <code>ArgumentParser</code> then <em>argparse</em> will use them as expected.</p>
+                        Standard deviation if generator == &quot;rnorm&quot;
+                        [default 1]
+</code></pre>
+
+<p>If you specify default values when creating your <code>ArgumentParser</code> then <code>argparse</code> will use them as expected.</p>
+
 <p><strong>bash$ example.R</strong></p>
+
 <pre><code>writing some verbose output to standard error...
 
--1.06685426911631
-2.07267182209934
-0.177732700153811
--0.364583749009423
-1.11266554323483</code></pre>
+1.4472100464992
+0.437112729248775
+-0.712710090359657
+-1.32557391944769
+2.15319696464575
+</code></pre>
+
 <p>Or you can specify your own values.</p>
-<p><strong>bash$ example.R --mean=10 --sd=10 --count=3</strong></p>
+
+<p><strong>bash$ example.R &ndash;mean=10 &ndash;sd=10 &ndash;count=3</strong></p>
+
 <pre><code>writing some verbose output to standard error...
 
-13.6157557470603
-4.92078844263403
-1.06084359314921</code></pre>
-<p>If you remember from the example program that <code>--quiet</code> had <code>action=&quot;store_false&quot;</code> and <code>dest=&quot;verbose&quot;</code>. This means that <code>--quiet</code> is a switch that turns the <code>verbose</code> option from its default value of <code>TRUE</code> to <code>FALSE</code>. Note how the <code>verbose</code> and <code>quiet</code> options store their value in the exact same variable.</p>
-<p><strong>bash$ example.R --quiet -c 4 --generator=&quot;runif&quot;</strong></p>
-<pre><code>0.585117821116
-0.44876047433354
-0.553818061249331
-0.706405627075583</code></pre>
-<p>If you specify an illegal flag then emph{argparse} will print out a usage message and an error message and quit.</p>
-<p><strong>bash$ example.R --silent -m 5</strong></p>
+2.92345112091412
+9.88108489158812
+20.4232656096356
+</code></pre>
+
+<p>If you remember from the example program that <code>--quiet</code> had <code>action=&quot;store_false&quot;</code> and 
+<code>dest=&quot;verbose&quot;</code>.  This means that <code>--quiet</code> is a switch that turns the <code>verbose</code> option from its default value of <code>TRUE</code> to <code>FALSE</code>.  Note how the <code>verbose</code> and <code>quiet</code> options store their value in the exact same variable.</p>
+
+<p><strong>bash$ example.R &ndash;quiet -c 4 &ndash;generator=&ldquo;runif&rdquo;</strong></p>
+
+<pre><code>0.428272113436833
+0.75378874107264
+0.012680133106187
+0.833299604477361
+</code></pre>
+
+<p>If you specify an illegal flag then \emph{argparse} will print out a usage message and an error message and quit.  </p>
+
+<p><strong>bash$ example.R &ndash;silent -m 5</strong></p>
+
 <pre><code>Error in .stop(output, &quot;parse error:&quot;) : parse error:
-usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
-                 [--sd standard deviation]
+usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR]
+                 [--mean MEAN] [--sd standard deviation]
 example.R: error: unrecognized arguments: --silent -m 5
 Calls: &lt;Anonymous&gt; -&gt; .stop
-Execution halted</code></pre>
-<p>If you specify the same option multiple times then emph{argparse} will use the value of the last option specified.</p>
+Execution halted
+</code></pre>
+
+<p>If you specify the same option multiple times then \emph{argparse} will use the value of the last option specified. </p>
+
 <p><strong>bash$ example.R -c 100 -c 2 -c 1000 -c 7</strong></p>
+
 <pre><code>writing some verbose output to standard error...
 
-0.60929519958713
--0.445694604931602
-0.545435124098396
--1.00232990318408
-0.305037245112613
--0.756307170375785
-1.36119370684695</code></pre>
-<p><em>argparse</em> can also parse positional arguments. Below we give an example program <em>display_file.R</em>, which is a program that prints out the contents of a single file (the required positional argument, not an optional argument) and which accepts the normal help option as well as an option to add line numbers to the output.</p>
-<p><strong>bash$ display_file.R --help</strong></p>
+-0.0498266030599203
+0.54288527186872
+-1.76350847410052
+-0.473412840513129
+-2.02301769017762
+0.351817000261324
+-1.03546459582053
+</code></pre>
+
+<p><code>argparse</code> can also parse positional arguments.  Below we give an example program <code>display_file.R</code>, which is a program that prints out the contents of a single file (the required positional argument, not an optional argument) and which accepts the normal help option as well as an option to add line numbers to the output.</p>
+
+<p><strong>bash$ display_file.R &ndash;help</strong></p>
+
 <pre><code>usage: display_file.R [-h] [-n] file
 
 positional arguments:
@@ -129,8 +335,12 @@ positional arguments:
 
 optional arguments:
   -h, --help         show this help message and exit
-  -n, --add_numbers  Print line number at the beginning of each line [default]</code></pre>
-<p><strong>bash$ display_file.R --add_numbers display_file.R</strong></p>
+  -n, --add_numbers  Print line number at the beginning of each line
+                     [default]
+</code></pre>
+
+<p><strong>bash$ display_file.R &ndash;add_numbers display_file.R</strong></p>
+
 <pre><code>1 #!/usr/bin/env Rscript
 2 # Copyright 2012-2013 Trevor L Davis &lt;trevor.l.davis@gmail.com&gt;
 3 #  
@@ -167,13 +377,24 @@ optional arguments:
 34     cat(paste(1:length(file_text), file_text), sep = &quot;\n&quot;)
 35 } else {
 36     cat(file_text, sep = &quot;\n&quot;)
-37 }</code></pre>
+37 }
+</code></pre>
+
 <p><strong>bash$ display_file.R non_existent_file.txt</strong></p>
+
 <pre><code>Error: Specified file ( non_existent_file.txt ) does not exist
-Execution halted</code></pre>
+Execution halted
+</code></pre>
+
 <p><strong>bash$ display_file.R</strong></p>
+
 <pre><code>Error in .stop(output, &quot;parse error:&quot;) : parse error:
 usage: display_file.R [-h] [-n] file
 display_file.R: error: the following arguments are required: file
 Calls: &lt;Anonymous&gt; -&gt; .stop
-Execution halted</code></pre>
+Execution halted
+</code></pre>
+
+</body>
+
+</html>
