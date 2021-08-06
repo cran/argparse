@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2020 Trevor L. Davis <trevor.l.davis@gmail.com>
+# Copyright (c) 2012-2021 Trevor L. Davis <trevor.l.davis@gmail.com>
 #
 #  This file is free software: you may copy, redistribute and/or modify it
 #  under the terms of the GNU General Public License as published by the
@@ -47,21 +47,23 @@
 #' @export
 #' @examples
 #'
-#' parser <- ArgumentParser(description='Process some integers')
-#' parser$add_argument('integers', metavar='N', type = "integer", nargs='+',
-#'                    help='an integer for the accumulator')
-#' parser$add_argument('--sum', dest='accumulate', action='store_const',
-#'                    const='sum', default='max',
-#'                    help='sum the integers (default: find the max)')
-#' parser$print_help()
-#' # default args for ArgumentParser()$parse_args are commandArgs(TRUE)
-#' # which is what you'd want for an Rscript but not for interactive use
-#' args <- parser$parse_args(c("--sum", "1", "2", "3"))
-#' accumulate_fn <- get(args$accumulate)
-#' print(accumulate_fn(args$integers))
+#' if (argparse:::detects_python()) {
+#'   parser <- ArgumentParser(description='Process some integers')
+#'   parser$add_argument('integers', metavar='N', type = "integer", nargs='+',
+#'                      help='an integer for the accumulator')
+#'   parser$add_argument('--sum', dest='accumulate', action='store_const',
+#'                      const='sum', default='max',
+#'                      help='sum the integers (default: find the max)')
+#'   parser$print_help()
+#'   # default args for ArgumentParser()$parse_args are commandArgs(TRUE)
+#'   # which is what you'd want for an Rscript but not for interactive use
+#'   args <- parser$parse_args(c("--sum", "1", "2", "3"))
+#'   accumulate_fn <- get(args$accumulate)
+#'   print(accumulate_fn(args$integers))
+#' }
 ArgumentParser <- function(..., python_cmd = NULL) { # nolint
-    python_cmd <- .find_python_cmd(python_cmd)
-    .assert_python_cmd(python_cmd)
+    python_cmd <- find_python_cmd(python_cmd)
+    assert_python_cmd(python_cmd)
     initial_python_code <- c("import argparse",
         "try:",
         "    import json",
@@ -118,7 +120,7 @@ Subparsers <- R6Class("Subparsers", # nolint
             private$n_subparsers <- private$n_subparsers + 1
             private$python_code$append(sprintf("%s = %s.add_parser(%s)",
                             parser_name, private$name,
-                            convert_..._to_arguments("add_argument", ...)))
+                            convert_..._to_arguments("ArgumentParser", ...)))
             Parser$new(private$python_code, parser_name)
         }
     ),
@@ -150,8 +152,7 @@ Parser <- R6Class("Parser", # nolint
                 .stop(message, "non-ascii character error:")
             } else if (any(grepl("^SyntaxError: positional argument follows keyword argument", output)) ||
                        grepl("^SyntaxError: non-keyword arg after keyword arg", output[2])) {
-                message <- paste("Positional argument following keyword argument.",
-                                 "Please note ``ArgumentParser`` only accepts keyword arguments.")
+                message <- "Positional argument following keyword argument."
                 .stop(message, "syntax error:")
             } else if (grepl("^\\{", output)) {
                 args <- jsonlite::fromJSON(paste(output, collapse = ""))
@@ -240,7 +241,7 @@ convert_..._to_arguments <- function(mode, ...) { # nolint
     argument_list <- list(...)
     argument_names <- names(argument_list)
     if (is.null(argument_names))
-        argument_names <- rep("", length(argument_list))
+        argument_names <- rep_len("", length(argument_list))
     equals <- ifelse(argument_names == "", "", "=")
     proposed_arguments <- c()
     for (ii in seq_along(argument_list)) {
@@ -264,12 +265,24 @@ convert_..._to_arguments <- function(mode, ...) { # nolint
     }
     # Set right default prog name if not specified, if possible
     # Do last to not screw up other fixes with prog insertion
-    if (mode == "ArgumentParser" && all(!grepl("prog=", proposed_arguments))) {
+    if (mode == "ArgumentParser" && needs_prog(argument_names)) {
         prog <- get_Rscript_filename()
         if (is.na(prog)) prog <- "PROGRAM"
         proposed_arguments <- c(sprintf("prog='%s'", prog), proposed_arguments)
     }
     return(paste(proposed_arguments, collapse = ", "))
+}
+
+needs_prog <- function(argument_names) {
+    if (length(argument_names) == 0L) {
+        TRUE
+    } else if (argument_names[1L] == "") {
+        FALSE
+    } else if (any(argument_names == "prog")) {
+        FALSE
+    } else {
+        TRUE
+    }
 }
 
 # Manually copied over from getopt to eliminate it as a dependency
@@ -283,7 +296,7 @@ get_Rscript_filename <- function() { # nolint
 
 # Internal function to check python cmd is okay
 # @param python_cmd Python cmd to use
-.assert_python_cmd <- function(python_cmd) {
+assert_python_cmd <- function(python_cmd) {
     if (!findpython::is_python_sufficient(python_cmd, required_modules = c("argparse", "json | simplejson"))) {
         stop(paste(sprintf("python executable %s either is not installed,", python_cmd),
                 "is not on the path, or does not have argparse, json modules",
@@ -291,9 +304,15 @@ get_Rscript_filename <- function() { # nolint
     }
 }
 
+detects_python <- function() {
+    python_cmd <- find_python_cmd()
+    findpython::is_python_sufficient(python_cmd,
+                                     required_modules = c("argparse", "json | simplejson"))
+}
+
 # Internal function to find python cmd
 # @param python_cmd  Python cmd to use
-.find_python_cmd <- function(python_cmd) {
+find_python_cmd <- function(python_cmd = NULL) {
     if (is.null(python_cmd)) {
         python_cmd <- getOption("python_cmd")
     }
