@@ -12,7 +12,7 @@
 
 
 
-<title>arpagrse Command Line Argument Parsing</title>
+<title>argparse Command Line Argument Parsing</title>
 
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
@@ -42,7 +42,7 @@
 
 
 
-<h1 class="title toc-ignore">arpagrse Command Line Argument Parsing</h1>
+<h1 class="title toc-ignore">argparse Command Line Argument Parsing</h1>
 
 
 
@@ -112,8 +112,8 @@ if( args$generator == &quot;rnorm&quot;) {
 cat(&quot;\n&quot;)</code></pre>
 <p>By default <code>argparse</code> will generate a help message if it encounters <code>--help</code> or <code>-h</code> on the command line. Note how <code>%(default)s</code> in the example program was replaced by the actual default values in the help statement that <code>argparse</code> generated.</p>
 <p><strong>bash$ example.R –help</strong></p>
-<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
-                 [--sd standard deviation]
+<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR]
+                 [--mean MEAN] [--sd standard deviation]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -130,43 +130,43 @@ optional arguments:
 <p><strong>bash$ example.R</strong></p>
 <pre><code>writing some verbose output to standard error...
 
--0.32259287103305
--0.620923101709862
--0.366456582196151
--1.02537882054658
--1.59934663661836</code></pre>
+-1.27007759741002
+-1.90250481461292
+0.225384035978718
+-0.36390484630603
+-0.664548825186102</code></pre>
 <p>Or you can specify your own values.</p>
 <p><strong>bash$ example.R –mean=10 –sd=10 –count=3</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-17.8290350401239
--5.1858026414023
-6.82254838878364</code></pre>
+15.2887630534967
+29.0728553034524
+5.51495131610106</code></pre>
 <p>If you remember from the example program that <code>--quiet</code> had <code>action=&quot;store_false&quot;</code> and <code>dest=&quot;verbose&quot;</code>. This means that <code>--quiet</code> is a switch that turns the <code>verbose</code> option from its default value of <code>TRUE</code> to <code>FALSE</code>. Note how the <code>verbose</code> and <code>quiet</code> options store their value in the exact same variable.</p>
 <p><strong>bash$ example.R –quiet -c 4 –generator=“runif”</strong></p>
-<pre><code>0.479256407124922
-0.706839221762493
-0.586250585503876
-0.040963213192299</code></pre>
+<pre><code>0.139087152434513
+0.161900640465319
+0.522910848958418
+0.260038381442428</code></pre>
 <p>If you specify an illegal flag then  will print out a usage message and an error message and quit.</p>
 <p><strong>bash$ example.R –silent -m 5</strong></p>
 <pre><code>Error in .stop(output, &quot;parse error:&quot;) : parse error:
-usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
-                 [--sd standard deviation]
+usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR]
+                 [--mean MEAN] [--sd standard deviation]
 example.R: error: unrecognized arguments: --silent -m 5
-Calls: &lt;Anonymous&gt; -&gt; .stop
+Calls: &lt;Anonymous&gt; -&gt; parse_args_output -&gt; .stop
 Execution halted</code></pre>
 <p>If you specify the same option multiple times then  will use the value of the last option specified.</p>
 <p><strong>bash$ example.R -c 100 -c 2 -c 1000 -c 7</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-1.51619213443987
--0.174219288038561
-0.379060727728853
--1.92215487451502
-0.866064623975587
-1.39396184313544
-1.36897419626927</code></pre>
+-0.516618593831609
+0.293329267613609
+-0.551851350469453
+0.0497586198759664
+0.344276000349947
+0.922382501052051
+0.253146621476047</code></pre>
 <p><code>argparse</code> can also parse positional arguments. Below we give an example program <code>display_file.R</code>, which is a program that prints out the contents of a single file (the required positional argument, not an optional argument) and which accepts the normal help option as well as an option to add line numbers to the output.</p>
 <p><strong>bash$ display_file.R –help</strong></p>
 <pre><code>usage: display_file.R [-h] [-n] file
@@ -222,7 +222,7 @@ Execution halted</code></pre>
 <pre><code>Error in .stop(output, &quot;parse error:&quot;) : parse error:
 usage: display_file.R [-h] [-n] file
 display_file.R: error: the following arguments are required: file
-Calls: &lt;Anonymous&gt; -&gt; .stop
+Calls: &lt;Anonymous&gt; -&gt; parse_args_output -&gt; .stop
 Execution halted</code></pre>
 
 

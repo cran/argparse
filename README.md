@@ -1,11 +1,8 @@
-argparse: Command line optional and positional argument parser
-==============================================================
+# argparse: Command line optional and positional argument parser
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/argparse)](https://cran.r-project.org/package=argparse)
 
-[![Travis-CI Build Status](https://travis-ci.org/trevorld/r-argparse.svg?branch=master)](https://travis-ci.org/trevorld/r-argparse)
-
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/trevorld/r-argparse?branch=master&svg=true)](https://ci.appveyor.com/project/trevorld/r-argparse/branch/master)
+[![R-CMD-check](https://github.com/trevorld/r-argparse/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-argparse/actions)
 
 [![Coverage Status](https://img.shields.io/codecov/c/github/trevorld/r-argparse.svg)](https://codecov.io/github/trevorld/r-argparse?branch=master)
 
@@ -25,8 +22,7 @@ To install the development version use the following command:
 
     > remotes::install_github("trevorld/r-argparse")
 
-dependencies
-------------
+## dependencies
 
 The package has a Python dependency. It is easily satisfied if you have
 Python (version 3.2 or higher) on your PATH. Read the INSTALL file for
@@ -41,8 +37,7 @@ and in order to build the vignette you will need the suggested R package
 
     sudo apt install pandoc
 
-examples
---------
+## examples
 
     > library("argparse")
     > parser <- ArgumentParser(description='Process some integers')
