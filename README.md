@@ -8,10 +8,11 @@
 
 [![RStudio CRAN mirror downloads](https://cranlogs.r-pkg.org/badges/argparse)](https://cran.r-project.org/package=argparse)
 
+<img src="man/figures/logo.png" align="right" width="200px" alt="argparse hex sticker">
+
 `argparse` is an R package which provides a command line parser to be
-used with Rscript to write \"\#!\" shebang scripts that gracefully
-accept positional and optional arguments and automatically generate
-usage.
+used with Rscript to write "\#!" shebang scripts that gracefully accept
+positional and optional arguments and automatically generate usage.
 
 To install the latest version released on CRAN use the following
 command:
@@ -26,7 +27,7 @@ To install the development version use the following command:
 
 The package has a Python dependency. It is easily satisfied if you have
 Python (version 3.2 or higher) on your PATH. Read the INSTALL file for
-more information if this doesn\'t describe you.
+more information if this doesn't describe you.
 
 Additionally this package depends on the R packages `R6`, `findpython`,
 and `jsonlite`.
@@ -59,7 +60,7 @@ and in order to build the vignette you will need the suggested R package
       --sum       sum the integers (default: find the max)
 
 Default args for `ArgumentParser()$parse_args` are `commandArgs(TRUE)`
-which is what you\'d want for an Rscript but not for interactive use:
+which is what you'd want for an Rscript but not for interactive use:
 
     > args <- parser$parse_args(c("--sum", "1", "2", "3")) 
     > accumulate_fn <- get(args$accumulate)
