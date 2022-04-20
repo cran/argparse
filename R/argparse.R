@@ -68,6 +68,16 @@ ArgumentParser <- function(..., python_cmd = NULL) { # nolint
         "except ImportError:",
         "    import simplejson as json",
         "",
+        "def logical(s):",
+        "    if isinstance(s, bool):",
+        "        return bool",
+        "    elif s in ('T', 'TRUE', 'True', 'true'):",
+        "        return True",
+        "    elif s in ('F', 'FALSE', 'False', 'false'):",
+        "        return False",
+        "    else:",
+        "        raise ValueError(\"could not convert string to logical: '{}'\".format(s))",
+        "",
         sprintf("parser = argparse.ArgumentParser(%s)",
                 convert_..._to_arguments("ArgumentParser", ...)),
         "")
@@ -235,13 +245,10 @@ get_python_type <- function(type, proposed_arguments) {
             character = "str",
             double = "float",
             integer = "int",
-            logical = "bool",
+            logical = "logical",
             stop(paste(sprintf("type %s not supported,", type),
                     "supported types:",
                     "'logical', 'integer', 'double' or 'character'")))
-    # warn if type set to "logical" and action set to "store"
-    if (python_type == "bool" && any(grepl("action='store'", proposed_arguments)))
-        warning("You almost certainly want to use action='store_true' or action='store_false' instead")
     sprintf("type=%s", python_type)
 }
 
