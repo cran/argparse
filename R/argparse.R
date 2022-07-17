@@ -202,27 +202,27 @@ parse_args_output <- function(output) {
         has_positional_arguments <- any(grepl("^positional arguments:", output))
         has_optional_arguments <- any(grepl("^optional arguments:|^options:", output))
         if (has_positional_arguments || has_optional_arguments) {
-            .print_message_and_exit(output, "help requested:")
+            print_message_and_exit(output, "help requested:")
         } else {
-            .stop(output, "parse error:")
+            pa_stop(output, "parse error:")
         }
     } else if (grepl("^Traceback", output[1])) {
-        .stop(output, "Error: python error")
+        pa_stop(output, "python error:")
     } else if (any(grepl("^SyntaxError: Non-ASCII character", output))) {
         message <- paste("Non-ASCII character detected.",
                        "If you wish to use Unicode arguments/options",
                        "please upgrade to Python 3.2+",
                        "Please see file INSTALL for more details.")
-        .stop(message, "non-ascii character error:")
+        pa_stop(message, "non-ascii character error:")
     } else if (any(grepl("^SyntaxError: positional argument follows keyword argument", output)) ||
                grepl("^SyntaxError: non-keyword arg after keyword arg", output[2])) {
         message <- "Positional argument following keyword argument."
-        .stop(message, "syntax error:")
+        pa_stop(message, "syntax error:")
     } else if (grepl("^\\{|^\\[", output)) {
         args <- jsonlite::fromJSON(paste(output, collapse = ""))
         return(args)
     } else { # presumably version number request
-        .print_message_and_exit(output, "version requested:")
+        print_message_and_exit(output, "version requested:")
     }
 }
 
@@ -358,14 +358,26 @@ find_python_cmd <- function(python_cmd = NULL) {
     python_cmd
 }
 
-.stop <- function(message, r_note) {
-        stop(paste(r_note, paste(message, collapse = "\n"), sep = "\n"))
+pa_stop <- function(message, r_note) {
+    msg <- paste(c(r_note, message), collapse = "\n")
+    cnd <- errorCondition(msg,
+                          call = "argparse::parse_args_output(output)",
+                          class = "argparse_parse_error")
+    if (interactive()) {
+        stop(cnd)
+    } else {
+        signalCondition(cnd)
+        cat(message, sep = "\n", file = stderr())
+        opt <- options(show.error.messages = FALSE)
+        on.exit(options(opt))
+        stop(cnd)
+    }
 }
 
 # Internal function to print message
-.print_message_and_exit <- function(message, r_note) {
+print_message_and_exit <- function(message, r_note) {
     if (interactive()) {
-        .stop(message, r_note)
+        pa_stop(message, r_note)
     } else {
         cat(message, sep = "\n")
         quit(status = 0)

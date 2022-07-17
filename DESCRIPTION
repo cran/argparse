@@ -1,8 +1,8 @@
 Package: argparse
 Type: Package
 Title: Command Line Optional and Positional Argument Parser
-Version: 2.1.5
-Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"), 
+Version: 2.1.6
+Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"),
              email="trevor.l.davis@gmail.com",
              comment = c(ORCID = "0000-0001-6341-4639")),
     person("Allen", "Day", role="ctb", comment="Some documentation and examples ported from the getopt package."),
@@ -16,6 +16,7 @@ Copyright: See file (inst/)COPYRIGHTS.
 URL: https://github.com/trevorld/r-argparse
 BugReports: https://github.com/trevorld/r-argparse/issues
 LazyLoad: yes
+Depends: R (>= 3.6.0)
 Imports: R6, findpython, jsonlite
 SystemRequirements: python (>= 3.2)
 Suggests: knitr (>= 1.15.19), rmarkdown, testthat
@@ -23,7 +24,7 @@ VignetteBuilder: knitr
 RoxygenNote: 7.1.2
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2022-04-20 20:08:39 UTC; trevor
+Packaged: 2022-07-17 07:01:42 UTC; trevorld
 Author: Trevor L Davis [aut, cre] (<https://orcid.org/0000-0001-6341-4639>),
   Allen Day [ctb] (Some documentation and examples ported from the getopt
     package.),
@@ -32,4 +33,4 @@ Author: Trevor L Davis [aut, cre] (<https://orcid.org/0000-0001-6341-4639>),
   Paul Newell [ctb]
 Maintainer: Trevor L Davis <trevor.l.davis@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-04-20 21:02:29 UTC
+Date/Publication: 2022-07-17 08:10:02 UTC
