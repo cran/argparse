@@ -11,7 +11,7 @@
 <img src="man/figures/logo.png" align="right" width="200px" alt="argparse hex sticker">
 
 `argparse` is an R package which provides a command line parser to be
-used with Rscript to write "\#!" shebang scripts that gracefully accept
+used with Rscript to write "#!" shebang scripts that gracefully accept
 positional and optional arguments and automatically generate usage.
 
 To install the latest version released on CRAN use the following

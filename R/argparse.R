@@ -70,7 +70,7 @@ ArgumentParser <- function(..., python_cmd = NULL) { # nolint
         "",
         "def logical(s):",
         "    if isinstance(s, bool):",
-        "        return bool",
+        "        return s",
         "    elif s in ('T', 'TRUE', 'True', 'true'):",
         "        return True",
         "    elif s in ('F', 'FALSE', 'False', 'false'):",
@@ -144,6 +144,13 @@ Parser <- R6Class("Parser", # nolint
             output <- private$python_code$run(new_code)
             parse_args_output(output)
         },
+        parse_intermixed_args = function(args = commandArgs(TRUE)) {
+            new_code <- c(sprintf("args = %s.parse_intermixed_args([%s])", private$name,
+                            paste(sprintf("'%s'", args), collapse = ", ")),
+                    "print(json.dumps(args.__dict__, sort_keys=True))")
+            output <- private$python_code$run(new_code)
+            parse_args_output(output)
+        },
         parse_known_args = function(args = commandArgs(TRUE)) {
             new_code <- c(sprintf("args_remainder = %s.parse_known_args([%s])", private$name,
                             paste(sprintf("'%s'", args), collapse = ", ")),
@@ -151,12 +158,35 @@ Parser <- R6Class("Parser", # nolint
             output <- private$python_code$run(new_code)
             parse_args_output(output)
         },
+        parse_known_intermixed_args = function(args = commandArgs(TRUE)) {
+            new_code <- c(sprintf("args_remainder = %s.parse_known_intermixed_args([%s])", private$name,
+                            paste(sprintf("'%s'", args), collapse = ", ")),
+                    "print(json.dumps((args_remainder[0].__dict__, args_remainder[1])))")
+            output <- private$python_code$run(new_code)
+            parse_args_output(output)
+        },
+        format_help = function() {
+            paste(private$python_code$run(sprintf("%s.print_help()", private$name)),
+                  collapse = "\n")
+        },
+        format_usage = function() {
+            paste(private$python_code$run(sprintf("%s.print_usage()", private$name)),
+                  collapse = "\n")
+        },
         print_help = function() {
             cat(private$python_code$run(sprintf("%s.print_help()", private$name)), sep = "\n")
             invisible(NULL)
         },
         print_usage = function() {
             cat(private$python_code$run(sprintf("%s.print_usage()", private$name)), sep = "\n")
+            invisible(NULL)
+        },
+        get_default = function(...) {
+            stop("We don't currently support `get_default()`")
+        },
+        set_defaults = function(...) {
+            private$python_code$append(sprintf("%s.set_defaults(%s)", private$name,
+                            convert_..._to_arguments("add_argument", ...)))
             invisible(NULL)
         },
         add_argument = function(...) {
@@ -228,7 +258,7 @@ parse_args_output <- function(output) {
 
 # @param argument argument to be converted from R to Python
 convert_argument <- function(argument, as_list = FALSE) {
-    if (is.character(argument)) argument <- shQuote(argument, type = "sh")
+    if (is.character(argument)) argument <- paste0('"""', argument, '"""')
     if (is.numeric(argument)) argument <- as.character(argument)
     if (is.logical(argument)) argument <- ifelse(argument, "True", "False")
     if (is.null(argument)) argument <- "None"
@@ -246,6 +276,7 @@ get_python_type <- function(type, proposed_arguments) {
             double = "float",
             integer = "int",
             logical = "logical",
+            numeric = "float",
             stop(paste(sprintf("type %s not supported,", type),
                     "supported types:",
                     "'logical', 'integer', 'double' or 'character'")))
@@ -358,6 +389,10 @@ find_python_cmd <- function(python_cmd = NULL) {
     python_cmd
 }
 
+quieter_error_handler <- function(e) {
+    quit('no', status = 1, runLast = FALSE)
+}
+
 pa_stop <- function(message, r_note) {
     msg <- paste(c(r_note, message), collapse = "\n")
     cnd <- errorCondition(msg,
@@ -368,7 +403,8 @@ pa_stop <- function(message, r_note) {
     } else {
         signalCondition(cnd)
         cat(message, sep = "\n", file = stderr())
-        opt <- options(show.error.messages = FALSE)
+        opt <- options(error = getOption("error",  quieter_error_handler),
+                       show.error.messages = FALSE)
         on.exit(options(opt))
         stop(cnd)
     }

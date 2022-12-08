@@ -1,3 +1,24 @@
+argparse 2.2.0
+==============
+
+* We now support the following `ArgumentParser()` methods:
+
+  * `format_help()`
+  * `format_usage()`
+  * `parse_intermixed_args()` (#45)
+  * `parse_known_intermixed_args()` (#45)
+  * `set_defaults()` (#43).  Suggestion of @oliverbothe.
+
+* When an error is thrown by `ArgumentParser()$parse_args()` and `interactive()` is `FALSE`
+  and `getOption("error")` is `NULL` then
+  we now use a quieter default error handler that doesn't output a trailing "Execution halted".
+
+* `add_argument()` now allows "numeric" as an alias for "double" for the `type` argument (#42).
+  Suggestion of @dariober.
+
+* `ArgumentParser()` now handles `description` arguments with newlines in them (#44).
+  Thanks Arthur Gilly (@agilly) for bug report.
+
 argparse 2.1.6
 ==============
 
@@ -5,7 +26,7 @@ argparse 2.1.6
 
   They are now less verbose when `interactive()` is `FALSE` (#40).
 
-  There may still a trailing "Execution halted" line output by R's default error handler
+  There may still be a trailing "Execution halted" line output by R's default error handler
   (when `interactive()` is `FALSE`).
   This can be silenced by setting a new error handler near the top of your Rscript e.g.
 

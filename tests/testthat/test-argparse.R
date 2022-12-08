@@ -26,6 +26,8 @@ test_that("print_help works as expected", {
     expect_output(parser$print_help(), "optional arguments:|options:")
     expect_output(parser$print_help(), "Process some integers.")
     expect_output(parser$print_usage(), "usage:")
+    expect_true(grepl("Process some integers.", parser$format_help()))
+    expect_true(grepl("usage:", parser$format_usage()))
 
     # Request/bug by PlasmaBinturong
     parser$add_argument("integers", metavar = "N", type = "integer", nargs = "+",
@@ -38,10 +40,10 @@ test_that("print_help works as expected", {
 
 test_that("convert_argument works as expected", {
     skip_if_not(detects_python())
-    expect_equal(convert_argument("foobar"), "'foobar'")
+    expect_equal(convert_argument("foobar"), '"""foobar"""')
     expect_equal(convert_argument(14.9), "14.9")
     expect_equal(convert_argument(c(12.1, 14.9)), "(12.1, 14.9)")
-    expect_equal(convert_argument(c("a", "b")), "('a', 'b')")
+    expect_equal(convert_argument(c("a", "b")), '("""a""", """b""")')
 })
 
 test_that("convert_..._to_arguments works as expected", {
@@ -49,17 +51,17 @@ test_that("convert_..._to_arguments works as expected", {
     # test in mode "add_argument"
     c.2a <- function(...) convert_..._to_arguments("add_argument", ...)
     waz <- "wazzup"
-    expect_equal(c.2a(foo = "bar", hello = "world"), "foo='bar', hello='world'")
-    expect_equal(c.2a(foo = "bar", waz), "foo='bar', 'wazzup'")
+    expect_equal(c.2a(foo = "bar", hello = "world"), 'foo="""bar""", hello="""world"""')
+    expect_equal(c.2a(foo = "bar", waz), 'foo="""bar""", """wazzup"""')
     expect_equal(c.2a(type = "character"), "type=str")
     expect_equal(c.2a(default = TRUE), "default=True")
     expect_equal(c.2a(default = 3.4), "default=3.4")
-    expect_equal(c.2a(default = "foo"), "default='foo'")
+    expect_equal(c.2a(default = "foo"), 'default="""foo"""')
     # test in mode "ArgumentParser"
     c.2a <- function(...) convert_..._to_arguments("ArgumentParser", ...)
     expect_match(c.2a(argument_default = FALSE), "argument_default=False")
     expect_match(c.2a(argument_default = 30), "argument_default=30")
-    expect_match(c.2a(argument_default = "foobar"), "argument_default='foobar'")
+    expect_match(c.2a(argument_default = "foobar"), 'argument_default="""foobar"""')
     expect_match(c.2a(foo = "bar"), "^prog='PROGRAM'|^prog='test-argparse.R'")
     expect_match(c.2a(formatter_class = "argparse.ArgumentDefaultsHelpFormatter"),
                  "formatter_class=argparse.ArgumentDefaultsHelpFormatter")
@@ -151,7 +153,35 @@ test_that("parse_known_args() works as expected", {
 
 })
 
+test_that("parse_intermixed_args() works as expected", {
+    skip_if_not(detects_python())
+    parser <- ArgumentParser()
+    parser$add_argument('--foo')
+    parser$add_argument('cmd')
+    parser$add_argument('rest', nargs='*', type='integer')
+    args <- strsplit('doit 1 --foo bar 2 3', ' ')[[1]]
+    args <- parser$parse_intermixed_args(args)
+    expect_equal(args$cmd, 'doit')
+    expect_equal(args$foo, 'bar')
+    expect_equal(args$rest, 1:3)
 
+    args <- strsplit('doit 1 --foo bar 2 3 -n 4', ' ')[[1]]
+    a_r <- parser$parse_known_intermixed_args(args)
+    expect_equal(a_r[[1]]$cmd, 'doit')
+    expect_equal(a_r[[1]]$foo, 'bar')
+    expect_equal(a_r[[1]]$rest, 1:3)
+    expect_equal(a_r[[2]], c('-n', '4'))
+})
+
+test_that("set_defaults() works as expected", {
+    skip_if_not(detects_python())
+    parser <- ArgumentParser()
+    parser$set_defaults(bar=42)
+    args <- parser$parse_args(c())
+    expect_equal(args$bar, 42)
+
+    # expect_equal(parser$get_default("bar"), 42)
+})
 
 test_that("ArgumentParser works as expected", {
     skip_if_not(detects_python())
@@ -189,17 +219,25 @@ test_that("parse_args() works as expected", {
     p$add_argument("--int", type = "integer")
     p$add_argument("--double", type = "double")
     p$add_argument("--character", type = "character")
+    p$add_argument("--numeric", type = "numeric")
 
     input <- "1"
     args <- p$parse_args(c("--int", input,
                            "--double", input,
-                           "--character", input))
+                           "--character", input,
+                           "--numeric", input))
     expect_equal(class(args$int), "integer")
     expect_equal(class(args$double), "numeric")
     expect_equal(class(args$character), "character")
+    expect_equal(class(args$numeric), "numeric")
     expect_equal(args$int, as.integer(1.0))
     expect_equal(args$double, 1.0)
     expect_equal(args$character, "1")
+    expect_equal(args$numeric, 1.0)
+
+    # bug reported by Arthur Gilly
+    parser <- ArgumentParser(description="Description of tool.\nAuthor information.")
+    expect_true(is.list(parser$parse_args()))
 
     # Bug found by Taylor Pospisil
     skip_on_os("windows") # Didn't work on Github Actions Windows

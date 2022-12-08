@@ -1,12 +1,12 @@
 Package: argparse
 Type: Package
 Title: Command Line Optional and Positional Argument Parser
-Version: 2.1.6
+Version: 2.2.1
 Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"),
              email="trevor.l.davis@gmail.com",
              comment = c(ORCID = "0000-0001-6341-4639")),
     person("Allen", "Day", role="ctb", comment="Some documentation and examples ported from the getopt package."),
-    person("Python Software Foundation", role="ctb", comment="Some documentation from the optparse Python module."),
+    person("Python Software Foundation", role="ctb", comment="Some documentation from the argparse Python module."),
     person("Paul", "Newell", role="ctb"))
 Description: A command line parser to
     be used with Rscript to write "#!" shebang scripts that gracefully
@@ -24,13 +24,13 @@ VignetteBuilder: knitr
 RoxygenNote: 7.1.2
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2022-07-17 07:01:42 UTC; trevorld
+Packaged: 2022-12-08 17:46:24 UTC; trevor
 Author: Trevor L Davis [aut, cre] (<https://orcid.org/0000-0001-6341-4639>),
   Allen Day [ctb] (Some documentation and examples ported from the getopt
     package.),
-  Python Software Foundation [ctb] (Some documentation from the optparse
+  Python Software Foundation [ctb] (Some documentation from the argparse
     Python module.),
   Paul Newell [ctb]
 Maintainer: Trevor L Davis <trevor.l.davis@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-07-17 08:10:02 UTC
+Date/Publication: 2022-12-08 20:20:02 UTC
