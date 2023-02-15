@@ -1,4 +1,10 @@
-argparse 2.2.0
+argparse 2.2.2
+==============
+
+* Fixes bug when `add_argument()` `help` values ended in a `"` (#46).
+  Thanks Oliver Dreschel (@oliverdreschel) for bug report.
+
+argparse 2.2.1
 ==============
 
 * We now support the following `ArgumentParser()` methods:

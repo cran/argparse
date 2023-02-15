@@ -322,24 +322,24 @@ options:
 <p><strong>bash$ example.R</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-1.2165673840508
--0.785616318304477
-1.34639115692215
--0.711751671954615
--0.910246977854315</code></pre>
+-1.45433553496581
+-0.420626330419174
+0.396490423996348
+-1.56647410185768
+0.479698583969788</code></pre>
 <p>Or you can specify your own values.</p>
 <p><strong>bash$ example.R –mean=10 –sd=10 –count=3</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-12.6009256927866
-3.38665165436118
-9.59222193285537</code></pre>
+-2.76778015561505
+19.61048211139
+24.1463810432173</code></pre>
 <p>If you remember from the example program that <code>--quiet</code> had <code>action=&quot;store_false&quot;</code> and <code>dest=&quot;verbose&quot;</code>. This means that <code>--quiet</code> is a switch that turns the <code>verbose</code> option from its default value of <code>TRUE</code> to <code>FALSE</code>. Note how the <code>verbose</code> and <code>quiet</code> options store their value in the exact same variable.</p>
 <p><strong>bash$ example.R –quiet -c 4 –generator=“runif”</strong></p>
-<pre><code>0.0883051110431552
-0.434725130675361
-0.708389938110486
-0.214734607376158</code></pre>
+<pre><code>0.973905279999599
+0.908720744773746
+0.950513848802075
+0.899739363696426</code></pre>
 <p>If you specify an illegal flag then  will print out a usage message and an error message and quit.</p>
 <p><strong>bash$ example.R –silent -m 5</strong></p>
 <pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN] [--sd standard deviation]
@@ -348,13 +348,13 @@ example.R: error: unrecognized arguments: --silent -m 5</code></pre>
 <p><strong>bash$ example.R -c 100 -c 2 -c 1000 -c 7</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-0.217445385266987
-0.694159228515319
-0.876880321101879
--0.595180907164564
-1.29706149666909
-1.51978566632373
--0.653626354642322</code></pre>
+-1.92178239013239
+-0.916384382547485
+-1.70285421613313
+0.599367145619473
+-0.743695539428097
+-0.659253200768984
+0.514520683676003</code></pre>
 <p><code>argparse</code> can also parse positional arguments. Below we give an example program <code>display_file.R</code>, which is a program that prints out the contents of a single file (the required positional argument, not an optional argument) and which accepts the normal help option as well as an option to add line numbers to the output.</p>
 <p><strong>bash$ display_file.R –help</strong></p>
 <pre><code>usage: display_file.R [-h] [-n] file

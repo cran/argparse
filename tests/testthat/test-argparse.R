@@ -92,6 +92,11 @@ test_that("add_argument works as expected", {
     expect_equal(arguments$label, c("a", "b"))
     expect_equal(arguments$bool, c(FALSE, TRUE))
 
+    # Bug found by Oliver Dreschel (@oliverdreschel)
+    p <- ArgumentParser()
+    p$add_argument('--listlab', type='character', help='This is a helpstring,"Containing Quotes"')
+    expect_equal(p$parse_args()$listlab, NULL)
+
     # Use R casting of logicals
     p <- ArgumentParser()
     p$add_argument("--bool", type = "logical", action = "store")
@@ -154,7 +159,7 @@ test_that("parse_known_args() works as expected", {
 })
 
 test_that("parse_intermixed_args() works as expected", {
-    skip_if_not(detects_python())
+    skip_if_not(detects_python(minimum_version = '3.7'))
     parser <- ArgumentParser()
     parser$add_argument('--foo')
     parser$add_argument('cmd')
