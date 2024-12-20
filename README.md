@@ -1,7 +1,7 @@
 # argparse: Command line optional and positional argument parser <img src="man/figures/logo.png" align="right" width="200px" alt="argparse hex sticker">
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/argparse)](https://cran.r-project.org/package=argparse)
-[![R-CMD-check](https://github.com/trevorld/r-argparse/workflows/R-CMD-check/badge.svg)](https://github.com/trevorld/r-argparse/actions)
+[![R-CMD-check](https://github.com/trevorld/r-argparse/actions/workflows/R-CMD-check.yaml/badge.svg?branch=master)](https://github.com/trevorld/r-argparse/actions)
 [![Coverage Status](https://codecov.io/github/trevorld/r-argparse/branch/master/graph/badge.svg)](https://app.codecov.io/github/trevorld/r-argparse?branch=master)
 [![RStudio CRAN mirror downloads](https://cranlogs.r-pkg.org/badges/argparse)](https://cran.r-project.org/package=argparse)
 

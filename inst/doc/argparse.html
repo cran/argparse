@@ -27,6 +27,22 @@ document.addEventListener('DOMContentLoaded', function(e) {
   }
 });
 </script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -305,7 +321,8 @@ if( args$generator == &quot;rnorm&quot;) {
 cat(&quot;\n&quot;)</code></pre>
 <p>By default <code>argparse</code> will generate a help message if it encounters <code>--help</code> or <code>-h</code> on the command line. Note how <code>%(default)s</code> in the example program was replaced by the actual default values in the help statement that <code>argparse</code> generated.</p>
 <p><strong>bash$ example.R –help</strong></p>
-<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN] [--sd standard deviation]
+<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
+                 [--sd standard deviation]
 
 options:
   -h, --help            show this help message and exit
@@ -322,39 +339,40 @@ options:
 <p><strong>bash$ example.R</strong></p>
 <pre><code>writing some verbose output to standard error...
 
--0.297358523624249
--1.25237729627517
-2.19208471401075
-0.568027744879793
--0.238502197273274</code></pre>
+0.586541466801601
+0.0108065531153874
+-0.253089269863339
+0.161148308884851
+0.134655240001449</code></pre>
 <p>Or you can specify your own values.</p>
 <p><strong>bash$ example.R –mean=10 –sd=10 –count=3</strong></p>
 <pre><code>writing some verbose output to standard error...
 
-13.0666007054686
--3.34990224224591
--1.1200086755296</code></pre>
+6.44578984683733
+17.7983417114359
+5.78828929018381</code></pre>
 <p>If you remember from the example program that <code>--quiet</code> had <code>action=&quot;store_false&quot;</code> and <code>dest=&quot;verbose&quot;</code>. This means that <code>--quiet</code> is a switch that turns the <code>verbose</code> option from its default value of <code>TRUE</code> to <code>FALSE</code>. Note how the <code>verbose</code> and <code>quiet</code> options store their value in the exact same variable.</p>
 <p><strong>bash$ example.R –quiet -c 4 –generator=“runif”</strong></p>
-<pre><code>0.875761628383771
-0.152897638967261
-0.667401979677379
-0.0258402647450566</code></pre>
+<pre><code>0.0964349613059312
+0.243355768499896
+0.711897624889389
+0.966504012234509</code></pre>
 <p>If you specify an illegal flag then  will print out a usage message and an error message and quit.</p>
 <p><strong>bash$ example.R –silent -m 5</strong></p>
-<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN] [--sd standard deviation]
+<pre><code>usage: example.R [-h] [-v] [-q] [-c number] [--generator GENERATOR] [--mean MEAN]
+                 [--sd standard deviation]
 example.R: error: unrecognized arguments: --silent -m 5</code></pre>
 <p>If you specify the same option multiple times then  will use the value of the last option specified.</p>
 <p><strong>bash$ example.R -c 100 -c 2 -c 1000 -c 7</strong></p>
 <pre><code>writing some verbose output to standard error...
 
--0.727982002902575
-1.4232203929957
-0.0386516210512271
--0.933989857153843
--0.512253440710936
--0.89176065255711
-1.30489222419739</code></pre>
+0.833570923788975
+-0.508349014790735
+0.433689855836708
+1.43513802000923
+0.720202132169123
+-0.341582346215813
+-0.596448124331658</code></pre>
 <p><code>argparse</code> can also parse positional arguments. Below we give an example program <code>display_file.R</code>, which is a program that prints out the contents of a single file (the required positional argument, not an optional argument) and which accepts the normal help option as well as an option to add line numbers to the output.</p>
 <p><strong>bash$ display_file.R –help</strong></p>
 <pre><code>usage: display_file.R [-h] [-n] file
